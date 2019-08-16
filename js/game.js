@@ -2,6 +2,7 @@ var game = {
     // game assets
     assets : [
         { name: "player",   type:"image", src:"data/img/sprite/gripe_run_right.png" },
+        { name: "enemy",   type:"image", src:"data/img/sprite/wheelie_right.png" },
         { name: "alien",   type:"image", src:"data/gfx/alien.png" },
         { name: "flushed", type:"image", src:"data/gfx/flushed.png" },
         { name: "scream",  type:"image", src:"data/gfx/scream.png" },

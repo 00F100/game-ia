@@ -5,12 +5,17 @@ var PlayScreen = me.Stage.extend( {
 
         me.levelDirector.loadLevel("area01");
 
-        me.game.world.addChild(new Player());
+        this.HUD = new HUD.Container();
+        me.game.world.addChild(this.HUD);
+
+        me.game.world.addChild(new HumanPlayer(this.HUD));
+
+        // me.game.world.addChild(new EnemyObject());
         // Add some objects
         // setInterval(function() {
-        //     for (var i = 0; i < 20; i++) {
-        //         me.game.world.addChild(new Player());
-        //     }
+            // for (var i = 0; i < 200; i++) {
+            //     me.game.world.addChild(new Player());
+            // }
         // }, 1000);
     }
 });
