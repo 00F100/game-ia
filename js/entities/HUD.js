@@ -27,13 +27,14 @@ game.HUD.enemyCreator = me.Renderable.extend({
     },
     update: function() {
         this.interval++;
-        if(this.interval >= 150) {
+        if(this.interval >= 30) {
             this.interval = 0;
-            var enemy = me.pool.pull("enemy", 619, 250, {width:64, height: 64});
-            me.game.world.addChild(enemy);
+            // console.log('here')
+            // var enemy = me.pool.pull("enemy", 619, 250, {width:64, height: 64});
+            me.game.world.addChild(new Smilie(619, 250, {width: 64, height: 64}));
+            // me.game.world.addChild(Smilie);
         }
                 // var enemy = me.pool.pull("enemy", 619, 250, {width:64, height: 64});
-                // me.game.world.addChild(enemy);
         return true;
     }
 });

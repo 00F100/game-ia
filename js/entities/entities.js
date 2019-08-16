@@ -65,17 +65,10 @@ game.PlayerEntity = me.Entity.extend({
         // Make all other objects solid
         switch (response.b.body.collisionType) {
             case me.collision.types.WORLD_SHAPE:
-              // Simulate a platform object
-              if (other.type === "platform") {
-                  return true;
-              }
+              return true;
               break;
 
             case me.collision.types.ENEMY_OBJECT:
-              return true;
-
-            default:
-              // Do not respond to other objects (e.g. coins)
               return false;
           }
 
@@ -124,6 +117,24 @@ game.EnemyEntity = me.Entity.extend({
    */
   update : function (dt) {
 
+
+    this.body.vel.x += (this.walkLeft) ? -this.body.accel.x * me.timer.tick : this.body.accel.x * me.timer.tick;
+    this.pos.add(this.body.vel);
+
+    // world limit check
+    if (this.pos.x >= 1024) {
+        this.pos.x = -15;
+    }
+    if (this.pos.x < -15) {
+        this.pos.x = 1024 - 1;
+    }
+    if (this.pos.y >= 768) {
+        this.pos.y = -15;
+    }
+    if (this.pos.y < -15) {
+        this.pos.y = 768 - 1;
+    }
+
       // if (this.walkLeft && this.pos.x <= this.startX) {
       //   this.walkLeft = false;
       // }
@@ -132,8 +143,7 @@ game.EnemyEntity = me.Entity.extend({
       // }
 
       // make it walk
-      this.renderable.flipX(this.walkLeft);
-      this.body.vel.x += (this.walkLeft) ? -this.body.accel.x * me.timer.tick : this.body.accel.x * me.timer.tick;
+      // this.renderable.flipX(this.walkLeft);
     // }
     // else {
     //   this.body.vel.x = 0;
@@ -146,7 +156,7 @@ game.EnemyEntity = me.Entity.extend({
     me.collision.check(this);
 
     // return true if we moved or if the renderable was updated
-    return (this._super(me.Entity, 'update', [dt]) || this.body.vel.x !== 0 || this.body.vel.y !== 0);
+    return true;
   },
 
   /**
@@ -154,25 +164,94 @@ game.EnemyEntity = me.Entity.extend({
    * (called when colliding with other objects)
    */
   onCollision : function (response, other) {
-    // switch (response.b.body.collisionType) {
-    //     case me.collision.types.DIE_OBJECT:
-    //     console.log('dieee')
-    //       me.game.world.removeChild(this);
-    //       return false;
-    //       break;
-    //   }
 
-      // Make the object solid
-      return true;
-    // if (response.b.body.collisionType !== me.collision.types.WORLD_SHAPE) {
+    switch (response.b.body.collisionType) {
+      case me.collision.types.WORLD_SHAPE:
+        return true;
+        break;
+
+      case me.collision.types.ENEMY_OBJECT:
+        if (this.alive) {
+          this.renderable.flicker(750);
+        }
+        return false;
+    }
+
+  return true;
+  // if (response.b.body.collisionType !== me.collision.types.WORLD_SHAPE) {
     //   // res.y >0 means touched by something on the bottom
     //   // which mean at top position for this one
-    //   if (this.alive && (response.overlapV.y > 0) && response.a.body.falling) {
-    //     this.renderable.flicker(750);
-    //   }
     //   return false;
     // }
     // // Make all other objects solid
     // return true;
   }
+});
+
+var Smilie = me.Entity.extend({
+    init : function (i) {
+        this._super(
+            me.Entity,
+            "init",
+            [
+                me.Math.random(-15, 1024),
+                me.Math.random(-15, 768),
+                {
+                    width : 16,
+                    height : 16,
+                    shapes : [ new me.Ellipse(4, 4, 8, 8) ]
+                }
+            ]
+        );
+
+        // disable gravity and add a random velocity
+        this.body.gravity = 0;
+        this.body.vel.set(me.Math.randomFloat(-4, 4), me.Math.randomFloat(-4, 4));
+
+        this.alwaysUpdate = true;
+
+        // add the coin sprite as renderable
+        this.renderable = new me.Sprite(0, 0, {image: me.loader.getImage('data/sfx/sprite/wheelie_right.png')});
+    },
+
+    update : function () {
+        this.pos.add(this.body.vel);
+
+        // world limit check
+        if (this.pos.x >= 1024) {
+            this.pos.x = -15;
+        }
+        if (this.pos.x < -15) {
+            this.pos.x = 1024 - 1;
+        }
+        if (this.pos.y >= 768) {
+            this.pos.y = -15;
+        }
+        if (this.pos.y < -15) {
+            this.pos.y = 768 - 1;
+        }
+
+        if (me.collision.check(this)) {
+            // me.collision.check returns true in case of collision
+            this.renderable.setOpacity(1.0);
+        }
+        else {
+            this.renderable.setOpacity(0.5);
+        }
+        return true;
+    },
+
+    // collision handler
+    onCollision : function (response) {
+
+        this.pos.sub(response.overlapN);
+        if (response.overlapN.x !== 0) {
+            this.body.vel.x = me.Math.randomFloat(-4, 4) * -Math.sign(this.body.vel.x);
+        }
+        if (response.overlapN.y !== 0) {
+            this.body.vel.y = me.Math.randomFloat(-4, 4) * -Math.sign(this.body.vel.y);
+        }
+
+        return false;
+    }
 });

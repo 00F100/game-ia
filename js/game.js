@@ -2,6 +2,10 @@
 /* Game namespace */
 var game = {
 
+    assets : [
+        { name: "enemyBox",   type:"image", src:"data/sfx/sprite/wheelie_right.png" }
+    ],
+
     // an object where to store game information
     data : {
         // score
