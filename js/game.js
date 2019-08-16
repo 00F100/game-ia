@@ -1,50 +1,33 @@
-
-/* Game namespace */
 var game = {
-
+    // game assets
     assets : [
-        { name: "enemyBox",   type:"image", src:"data/sfx/sprite/wheelie_right.png" }
+        { name: "player",   type:"image", src:"data/img/sprite/gripe_run_right.png" },
+        { name: "alien",   type:"image", src:"data/gfx/alien.png" },
+        { name: "flushed", type:"image", src:"data/gfx/flushed.png" },
+        { name: "scream",  type:"image", src:"data/gfx/scream.png" },
+        { name: "smile",   type:"image", src:"data/gfx/smile.png" },
+        { name: "smirk",   type:"image", src:"data/gfx/smirk.png" },
+        { name: "brick",   type:"image", src:"data/gfx/brick.png" },
+        { name: "area01map",   type:"image", src:"data/img/map/area01_level_tiles.png" },
+        { name: "area01",   type:"tmx", src:"data/map/area01.tmx" }
     ],
 
-    // an object where to store game information
-    data : {
-        // score
-        score : 0
-    },
-
-
-    // Run on page load.
-    "onload" : function () {
-        // Initialize the video.
+    onload: function()
+    {
         if (!me.video.init(640, 480, {wrapper : "screen", scale : "auto"})) {
             alert("Your browser does not support HTML5 canvas.");
             return;
         }
 
-        // Initialize the audio.
-        me.audio.init("mp3,ogg");
-
-        // set and load all resources.
-        // (this will also automatically switch to the loading screen)
-        me.loader.preload(game.resources, this.loaded.bind(this));
+        me.loader.preload(game.assets, this.loaded.bind(this));
     },
 
-    // Run on game resources loaded.
-    "loaded" : function () {
-        me.state.set(me.state.MENU, new game.TitleScreen());
-        me.state.set(me.state.PLAY, new game.PlayScreen());
+    loaded: function () {
+        me.state.set(me.state.PLAY, new PlayScreen());
 
-        // add our player entity in the entity pool
-        me.pool.register("player", game.PlayerEntity);
-        me.pool.register("enemy", game.EnemyEntity);
+        me.input.bindKey(me.input.KEY.UP, "jump", true);
+        me.input.bindKey(me.input.KEY.SPACE, "jump", true);
 
-        // enable the keyboard
-        // me.input.bindKey(me.input.KEY.LEFT, "left");
-        // me.input.bindKey(me.input.KEY.RIGHT, "right");
-        me.input.bindKey(me.input.KEY.UP, "jump");
-        me.input.bindKey(me.input.KEY.SPACE, "jump");
-
-        // Start the game.
         me.state.change(me.state.PLAY);
     }
 };

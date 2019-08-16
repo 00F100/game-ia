@@ -20,21 +20,6 @@ game.resources = [
         "src": "data/sfx/"
     },
     {
-        "name": "area01_bkg0",
-        "type": "image",
-        "src": "data/img/area01_bkg0.png"
-    },
-    {
-        "name": "area01_bkg1",
-        "type": "image",
-        "src": "data/img/area01_bkg1.png"
-    },
-    {
-        "name": "title_screen",
-        "type": "image",
-        "src": "data/img/gui/title_screen.png"
-    },
-    {
         "name": "area01_level_tiles",
         "type": "image",
         "src": "data/img/map/area01_level_tiles.png"
