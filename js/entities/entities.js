@@ -72,14 +72,14 @@ var Player = me.Entity.extend({
             me.Entity,
             "init",
             [
-                10,
-                10,
+                50,
+                0,
                 {
                     width : 32,
                     height : 64,
-                    // shapes : [ new me.Rect(0, 0, 32, 64) ],
-                    // framewidth: 32,
-                    // frameheight: 64
+                    shapes : [ new me.Rect(0, 0, 32, 64) ],
+                    framewidth: 32,
+                    frameheight: 64
                 }
             ]
         );

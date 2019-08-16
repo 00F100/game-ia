@@ -5,9 +5,12 @@ var PlayScreen = me.Stage.extend( {
 
         me.levelDirector.loadLevel("area01");
 
+        me.game.world.addChild(new Player());
         // Add some objects
-        // for (var i = 0; i < 100; i++) {
-            me.game.world.addChild(new Player());
-        // }
+        // setInterval(function() {
+        //     for (var i = 0; i < 20; i++) {
+        //         me.game.world.addChild(new Player());
+        //     }
+        // }, 1000);
     }
 });
