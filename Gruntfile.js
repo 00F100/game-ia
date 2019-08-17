@@ -6,10 +6,9 @@ module.exports = function(grunt) {
       dist: {
         src: [
           'lib/melonjs.js',
-          // 'lib/plugins/**/*.js',
-          'lib/plugins/debug/debugPanel.js',
+          'lib/plugins/**/*.js',
           'js/game.js',
-          'build/js/resources.js',
+          // 'build/js/resources.js',
           'js/**/*.js',
         ],
         dest: 'build/js/app.js'

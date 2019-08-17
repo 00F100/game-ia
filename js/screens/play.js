@@ -10,11 +10,11 @@ var PlayScreen = me.Stage.extend( {
 
         me.game.world.addChild(new HumanPlayer(this.HUD));
 
-        // me.game.world.addChild(new EnemyObject());
+        // me.game.world.addChild(new EnemyPlayer());
         // Add some objects
         // setInterval(function() {
-            // for (var i = 0; i < 200; i++) {
-            //     me.game.world.addChild(new Player());
+            // for (var i = 0; i < 50; i++) {
+                // me.game.world.addChild(new HumanPlayer(this.HUD));
             // }
         // }, 1000);
     }

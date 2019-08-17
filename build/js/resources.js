@@ -5,6 +5,41 @@ game.resources = [
         "src": "data/bgm/"
     },
     {
+        "name": "eita",
+        "type": "audio",
+        "src": "data/bgm/"
+    },
+    {
+        "name": "errou",
+        "type": "audio",
+        "src": "data/bgm/"
+    },
+    {
+        "name": "frango",
+        "type": "audio",
+        "src": "data/bgm/"
+    },
+    {
+        "name": "olokinho-meu",
+        "type": "audio",
+        "src": "data/bgm/"
+    },
+    {
+        "name": "porra-meu-ala",
+        "type": "audio",
+        "src": "data/bgm/"
+    },
+    {
+        "name": "vai-morre",
+        "type": "audio",
+        "src": "data/bgm/"
+    },
+    {
+        "name": "vilma",
+        "type": "audio",
+        "src": "data/bgm/"
+    },
+    {
         "name": "cling",
         "type": "audio",
         "src": "data/sfx/"
