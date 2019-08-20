@@ -23,6 +23,8 @@ var Sidewalk = me.Entity.extend({
         
         this.body.setVelocity(1.5,0);
 
+        this.alwaysUpdate = true;
+
         this.renderable = new me.Sprite(0, 0, {
             image: me.loader.getImage('sidewalk'),
             framewidth: 192,
@@ -47,6 +49,8 @@ var Sidewalk = me.Entity.extend({
         }
 
         this.body.update(dt);
+
+        return (this._super(me.Entity, 'update', [dt]) || this.body.vel.x !== 0 || this.body.vel.y !== 0);
     },
     onCollision: function() {
         return false;

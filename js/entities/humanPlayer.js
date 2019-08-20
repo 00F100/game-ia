@@ -1,17 +1,25 @@
 var HumanPlayer = me.Entity.extend({
     init : function () {
-        // this.hud = hud;
+
+        this.startPoint = {
+            x: 30,
+            y: 300
+        };
+
+        this.entityWidth = 74;
+        this.entityHeight = 94;
+
         this._super(
             me.Entity,
             "init",
             [
-                30, 300,
+                this.startPoint.x, this.startPoint.y,
                 {
-                    width : 70,
-                    height : 90,
-                    shapes : [ new me.Rect(0, 0, 70, 90) ],
-                    framewidth: 70,
-                    frameheight: 90
+                    width : this.entityWidth,
+                    height : this.entityHeight,
+                    shapes : [ new me.Rect(0, 0, this.entityWidth, this.entityHeight) ],
+                    framewidth: this.entityWidth,
+                    frameheight: this.entityHeight
                 }
             ]
         );
@@ -20,18 +28,25 @@ var HumanPlayer = me.Entity.extend({
 
         this.renderable = new me.Sprite(0, 0, {
             image: me.loader.getImage('player'),
-            framewidth: 70,
-            frameheight: 90
+            framewidth: this.entityWidth,
+            frameheight: this.entityHeight
         });
 
         this.renderable.addAnimation("walk",  [0, 1, 2, 3]);
-        this.renderable.addAnimation("jump",  [4]);
+        this.renderable.addAnimation("jump",  [5]);
+        this.renderable.addAnimation("duck",  [4]);
         this.renderable.setCurrentAnimation("walk");
 
         this.body.collisionType = me.collision.types.PLAYER_OBJECT;
     },
 
     update : function (dt) {
+
+        // if(this.renderable.isCurrentAnimation("duck")) {
+        //     this.body.height = 130;
+        // } else {
+        //     this.body.height = 90;
+        // }
 
         if(this.alive) {
             if (me.input.isKeyPressed('jump'))
@@ -42,12 +57,10 @@ var HumanPlayer = me.Entity.extend({
                     this.renderable.setCurrentAnimation("jump");
                     this.body.vel.y = -this.body.maxVel.y * me.timer.tick;
                     this.body.jumping = true;
-                    setTimeout(function() {
-
+                    me.timer.setTimeout(function() {
                         self.renderable.setCurrentAnimation("walk");
                     }, 500);
                 }
-            } else {
             }
         }
 
@@ -64,7 +77,6 @@ var HumanPlayer = me.Entity.extend({
             case me.collision.types.PLAYER_OBJECT:
                 return false;
                 break;
-
         //     case me.collision.types.ENEMY_OBJECT:
         //         this.alive = false;
         //         this.hud.continue = false;

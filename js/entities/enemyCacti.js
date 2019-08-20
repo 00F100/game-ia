@@ -36,5 +36,7 @@ var EnemyCacti = me.Entity.extend({
             me.game.world.removeChild(this);
         }
         this.body.update(dt);
+
+        return (this._super(me.Entity, 'update', [dt]) || this.body.vel.x !== 0 || this.body.vel.y !== 0);
     }
 });

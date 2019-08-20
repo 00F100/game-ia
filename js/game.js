@@ -43,14 +43,12 @@ var game = {
             alert("Your browser does not support HTML5 canvas.");
             return;
         }
-        me.loader.onload = this.loaded.bind(this);
         me.audio.init("mp3,ogg");
+        me.loader.onload = this.loaded.bind(this);
         me.loader.preload(game.assets);
     },
 
     loaded: function () {
-        me.state.set(me.state.PLAY, new PlayScreen());
-        me.state.set(me.state.PLAY, new PlayScreen());
         me.state.set(me.state.PLAY, new PlayScreen());
         me.input.bindKey(me.input.KEY.UP, "jump", true);
         me.input.bindKey(me.input.KEY.SPACE, "jump", true);

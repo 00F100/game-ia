@@ -20,7 +20,7 @@ var Cacti = me.Entity.extend({
             ]
         );
         
-        this.body.setVelocity(4,0);
+        this.body.setVelocity(2,0);
 
         this.renderable = new me.Sprite(0, 0, {
             image: me.loader.getImage('cacti'),
@@ -46,5 +46,7 @@ var Cacti = me.Entity.extend({
         }
 
         this.body.update(dt);
+
+        return (this._super(me.Entity, 'update', [dt]) || this.body.vel.x !== 0 || this.body.vel.y !== 0);
     }
 });
