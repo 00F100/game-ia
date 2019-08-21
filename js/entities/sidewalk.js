@@ -21,7 +21,7 @@ var Sidewalk = me.Entity.extend({
             ]
         );
         
-        this.body.setVelocity(1.5,0);
+        this.body.setVelocity(2 * game.vel.x,0);
 
         this.alwaysUpdate = true;
 

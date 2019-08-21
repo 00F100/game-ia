@@ -5,10 +5,10 @@ var game = {
         height: 480
     },
 
-    // vel: {
-    //     x: 1,
-    //     y: 0
-    // },
+    vel: {
+        x: 1,
+        y: 0
+    },
 
     // now: {
     //     x: 0,
@@ -33,6 +33,10 @@ var game = {
         // { name: "vilma", type: "audio", src: "data/bgm/"},
         { name: "sidewalk", type:"image", src:"data/img/sidewalk.png" },
         { name: "cacti", type:"image", src:"data/img/cacti.png" },
+        { name: "plant1", type:"image", src:"data/img/plant1.png" },
+        { name: "cloud1", type:"image", src:"data/img/cloud1.png" },
+        { name: "cloud2", type:"image", src:"data/img/cloud2.png" },
+        { name: "cloud3", type:"image", src:"data/img/cloud3.png" },
         { name: "player", type:"image", src:"data/img/player.png" },
         { name: "enemyCacti", type:"image", src:"data/img/enemyCacti.png" }
     ],

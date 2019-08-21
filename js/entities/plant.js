@@ -1,4 +1,4 @@
-var Cacti = me.Entity.extend({
+var Plant = me.Entity.extend({
 
     init: function(x, zi, ze, z) {
         this.z = z;
@@ -13,12 +13,12 @@ var Cacti = me.Entity.extend({
             "init",
             [
                 x, 
-                360,
+                380,
                 {
                     width : me.Math.random(zi, ze),
-                    height : 91,
-                    framewidth: 30,
-                    frameheight: 91
+                    height : 70,
+                    framewidth: 70,
+                    frameheight: 70
                 }
             ]
         );
@@ -26,9 +26,9 @@ var Cacti = me.Entity.extend({
         this.body.setVelocity(2,0);
 
         this.renderable = new me.Sprite(0, 0, {
-            image: me.loader.getImage('cacti'),
-            framewidth: 30,
-            frameheight: 91
+            image: me.loader.getImage('plant1'),
+            framewidth: 70,
+            frameheight: 70
         });
 
         this.body.collisionType = me.collision.types.NO_OBJECT
@@ -42,7 +42,7 @@ var Cacti = me.Entity.extend({
 
         if(limitX > 0 && !this.nextFrame) {
             this.nextFrame = true;
-            me.game.world.addChild(new Cacti(limit-this.body.accel.x, this.zi, this.ze), this.z);
+            me.game.world.addChild(new Plant(limit-this.body.accel.x, this.zi, this.ze), this.z);
         }
         if(limit <= 1) {
             me.game.world.removeChild(this);

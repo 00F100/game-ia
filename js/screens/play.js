@@ -1,14 +1,12 @@
 var PlayScreen = me.Stage.extend( {
     onResetEvent: function() {
-
-        this.sidewalk = new Sidewalk();
-        this.colorContent = new me.ColorLayer("background", "#909090", 0);
-
-        me.game.world.addChild(this.sidewalk);
-        me.game.world.addChild(this.colorContent, 0);
-        me.game.world.addChild(new Cacti());
-        me.game.world.addChild(new HumanPlayer());
-        me.game.world.addChild(new EnemyCacti());
+        me.game.world.addChild(new me.ColorLayer("background", "#ffe2b7", 0), 0);
+        me.game.world.addChild(new Cacti(0, 100, 1000, 1), 1);
+        me.game.world.addChild(new Plant(0, 100, 1000, 1), 1);
+        me.game.world.addChild(new Cloud(0, 100, 1000, 1), 1);
+        me.game.world.addChild(new HumanPlayer(), 20);
+        me.game.world.addChild(new Sidewalk(), 60);
+        // me.game.world.addChild(new EnemyCacti(), 30);
     },
     
     

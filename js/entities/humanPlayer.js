@@ -24,7 +24,7 @@ var HumanPlayer = me.Entity.extend({
             ]
         );
 
-        this.body.setVelocity(0,18);
+        this.body.setVelocity(0, 18);
 
         this.renderable = new me.Sprite(0, 0, {
             image: me.loader.getImage('player'),
