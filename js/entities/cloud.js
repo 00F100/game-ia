@@ -1,13 +1,15 @@
 var Cloud = me.Entity.extend({
 
     init: function(x, zi, ze, z) {
-        this.z = z;
-        this.zi = zi;
-        this.ze = ze;
+        
         if(x == undefined) {
             x = 0;
         }
-        this.nextFrame = false;
+        
+        this.z = z;
+        this.zi = zi;
+        this.ze = ze;
+
         this._super(
             me.Entity,
             "init",
@@ -22,8 +24,11 @@ var Cloud = me.Entity.extend({
                 }
             ]
         );
+        this.nextFrame = false;
+        this.alwaysUpdate = true;
         
-        this.body.setVelocity(1,0);
+        this.body.setVelocity(1 * game.vel.x,0);
+
 
         this.renderable = new me.Sprite(0, 0, {
             image: me.loader.getImage('cloud' + me.Math.random(1, 3)),
@@ -32,6 +37,8 @@ var Cloud = me.Entity.extend({
         });
 
         this.body.collisionType = me.collision.types.NO_OBJECT
+
+        this.isKinematic = true;
     },
 
     update: function(dt) {

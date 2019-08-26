@@ -23,7 +23,7 @@ var Cacti = me.Entity.extend({
             ]
         );
         
-        this.body.setVelocity(2,0);
+        this.body.setVelocity(2 * game.vel.x,0);
 
         this.renderable = new me.Sprite(0, 0, {
             image: me.loader.getImage('cacti'),
@@ -32,6 +32,8 @@ var Cacti = me.Entity.extend({
         });
 
         this.body.collisionType = me.collision.types.NO_OBJECT
+
+        this.isKinematic = true;
     },
 
     update: function(dt) {

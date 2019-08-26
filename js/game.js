@@ -44,6 +44,7 @@ var game = {
     onload: function()
     {
         if (!me.video.init(game.res.width, game.res.height, {wrapper : "screen", scale : "auto"})) {
+        // if (!me.video.init(game.res.width, game.res.height, {wrapper : "screen"})) {
             alert("Your browser does not support HTML5 canvas.");
             return;
         }
@@ -54,6 +55,7 @@ var game = {
 
     loaded: function () {
         me.state.set(me.state.PLAY, new PlayScreen());
+        me.input.bindKey(me.input.KEY.DOWN, "duck", true);
         me.input.bindKey(me.input.KEY.UP, "jump", true);
         me.input.bindKey(me.input.KEY.SPACE, "jump", true);
         me.state.change(me.state.PLAY);

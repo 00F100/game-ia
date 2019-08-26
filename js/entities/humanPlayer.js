@@ -7,7 +7,9 @@ var HumanPlayer = me.Entity.extend({
         };
 
         this.entityWidth = 74;
-        this.entityHeight = 94;
+        this.entityHeight = 89;
+
+        // Vf(2) = Vi(2) + 2 * a * D
 
         this._super(
             me.Entity,
@@ -24,8 +26,9 @@ var HumanPlayer = me.Entity.extend({
             ]
         );
 
-        this.body.setVelocity(0, 18);
-
+        this.body.gravity.y = 0.16;
+        this.body.setVelocity(0, 5);
+        this.alwaysUpdate = true;
         this.renderable = new me.Sprite(0, 0, {
             image: me.loader.getImage('player'),
             framewidth: this.entityWidth,
@@ -35,32 +38,41 @@ var HumanPlayer = me.Entity.extend({
         this.renderable.addAnimation("walk",  [0, 1, 2, 3]);
         this.renderable.addAnimation("jump",  [5]);
         this.renderable.addAnimation("duck",  [4]);
+        // this.renderable.addAnimation("die",  [5]);
         this.renderable.setCurrentAnimation("walk");
 
         this.body.collisionType = me.collision.types.PLAYER_OBJECT;
+
+        this.isKinematic = false;
     },
 
     update : function (dt) {
-
-        // if(this.renderable.isCurrentAnimation("duck")) {
-        //     this.body.height = 130;
-        // } else {
-        //     this.body.height = 90;
-        // }
-
         if(this.alive) {
+            var self = this;
             if (me.input.isKeyPressed('jump'))
             {
                 if (!this.body.jumping && !this.body.falling)
                 {
-                    var self = this;
                     this.renderable.setCurrentAnimation("jump");
                     this.body.vel.y = -this.body.maxVel.y * me.timer.tick;
                     this.body.jumping = true;
                     me.timer.setTimeout(function() {
                         self.renderable.setCurrentAnimation("walk");
-                    }, 500);
+                    }, 1000);
                 }
+            } else if (!this.body.jumping && me.input.isKeyPressed('duck')) {
+                this.body.shapes[0].points[2].y = 70;
+                this.body.shapes[0].points[3].y = 70;
+                console.log(this.body);
+
+                this.renderable.setCurrentAnimation("duck");
+                me.timer.setTimeout(function() {
+
+                    self.body.shapes[0].points[2].y = 89;
+                    self.body.shapes[0].points[3].y = 89;
+                    self.renderable.setCurrentAnimation("walk");
+
+                }, 500);
             }
         }
 
@@ -77,14 +89,14 @@ var HumanPlayer = me.Entity.extend({
             case me.collision.types.PLAYER_OBJECT:
                 return false;
                 break;
-        //     case me.collision.types.ENEMY_OBJECT:
-        //         this.alive = false;
-        //         this.hud.continue = false;
-        //         this.body.vel.x = 0;
-        //         this.body.vel.y = 0;
-        //         this.renderable.setCurrentAnimation("stop");
-        //         me.audio.play("errou");
-        //         break;
+            case me.collision.types.ENEMY_OBJECT:
+                this.alive = false;
+                // this.hud.continue = false;
+                this.body.vel.x = 0;
+                this.body.vel.y = 0;
+                // this.renderable.setCurrentAnimation("die");
+                // me.audio.play("errou");
+                break;
         }
         return true;
     }
