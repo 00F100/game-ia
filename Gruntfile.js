@@ -41,10 +41,10 @@ module.exports = function(grunt) {
       }
     },
 
-    clean: {
-      app: ['build/js/app.js'],
-      dist: ['build/','bin/'],
-    },
+    // clean: {
+    //   app: ['build/js/app.js'],
+    //   dist: ['build/','bin/'],
+    // },
 
     processhtml: {
       dist: {
@@ -81,19 +81,19 @@ module.exports = function(grunt) {
       },
     },
 
-    uglify: {
-      options: {
-        report: 'min',
-        preserveComments: 'some'
-      },
-      dist: {
-        files: {
-          'build/js/app.min.js': [
-            'build/js/app.js'
-          ]
-        }
-      }
-    },
+    // uglify: {
+    //   options: {
+    //     report: 'min',
+    //     preserveComments: 'some'
+    //   },
+    //   dist: {
+    //     files: {
+    //       'build/js/app.min.js': [
+    //         'build/js/app.js'
+    //       ]
+    //     }
+    //   }
+    // },
 
     connect: {
       server: {
@@ -161,9 +161,9 @@ module.exports = function(grunt) {
   });
 
   grunt.loadNpmTasks('grunt-contrib-concat');
-  grunt.loadNpmTasks('grunt-contrib-uglify');
+  // grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-contrib-copy');
-  grunt.loadNpmTasks('grunt-contrib-clean');
+  // grunt.loadNpmTasks('grunt-contrib-clean');
   grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-processhtml');
   grunt.loadNpmTasks("grunt-replace");
@@ -178,10 +178,10 @@ module.exports = function(grunt) {
     'resources',
     'concat',
     'replace',
-    'uglify',
+    // 'uglify',
     'copy',
     'processhtml',
-    'clean:app',
+    // 'clean:app',
   ]);
   grunt.registerTask('dist', ['default', 'download-electron', 'asar']);
   grunt.registerTask('serve', ['resources', 'connect', 'watch']);

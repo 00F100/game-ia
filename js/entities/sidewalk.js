@@ -1,6 +1,8 @@
 var Sidewalk = me.Entity.extend({
 
     init: function(x) {
+        var self = this;
+
         if(x == undefined) {
             x = 0;
         }
@@ -21,7 +23,7 @@ var Sidewalk = me.Entity.extend({
             ]
         );
         
-        this.body.setVelocity(2 * game.vel.x,0);
+        this.body.setVelocity(3 * game.vel.x,0);
 
         // this.alwaysUpdate = true;
 
@@ -33,10 +35,24 @@ var Sidewalk = me.Entity.extend({
 
         this.body.collisionType = me.collision.types.WORLD_SHAPE;
 
+        this.removed = false;
         this.isKinematic = false;
+
+        me.timer.setTimeout(function() {
+            if(!self.removed) {
+                me.game.world.removeChild(self);
+            }
+        // }, 5000);
+        }, 15000 / game.vel.x);
     },
 
     update: function(dt) {
+        if(game.vel.x <= 3.5) {
+            game.vel.x += 0.0003;
+        } else {
+            game.vel.x = 3.5;
+        }
+        console.log(game.vel.x);
         this.body.vel.x += -this.body.accel.x * me.timer.tick;
 
         var limit = this.body.ancestor.pos._x + this.body.width;
@@ -47,6 +63,7 @@ var Sidewalk = me.Entity.extend({
             me.game.world.addChild(new Sidewalk(limit-this.body.accel.x));
         }
         if(limit <= 1) {
+            this.removed = true;
             me.game.world.removeChild(this);
         }
 

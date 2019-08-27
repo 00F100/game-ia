@@ -1,6 +1,7 @@
 var Plant = me.Entity.extend({
 
     init: function(x, zi, ze, z) {
+        var self = this;
         this.z = z;
         this.zi = zi;
         this.ze = ze;
@@ -23,7 +24,7 @@ var Plant = me.Entity.extend({
             ]
         );
         
-        this.body.setVelocity(2 * game.vel.x,0);
+        this.body.setVelocity(3 * game.vel.x,0);
 
         // this.alwaysUpdate = true;
 
@@ -35,7 +36,15 @@ var Plant = me.Entity.extend({
 
         this.body.collisionType = me.collision.types.NO_OBJECT;
 
+        this.removed = false;
         this.isKinematic = true;
+
+        me.timer.setTimeout(function() {
+            if(!self.removed) {
+                me.game.world.removeChild(self);
+            }
+        // }, 5000);
+        }, 15000 / game.vel.x);
     },
 
     update: function(dt) {
@@ -49,6 +58,7 @@ var Plant = me.Entity.extend({
             me.game.world.addChild(new Plant(limit-this.body.accel.x, this.zi, this.ze), this.z);
         }
         if(limit <= 1) {
+            this.removed = true;
             me.game.world.removeChild(this);
         }
 

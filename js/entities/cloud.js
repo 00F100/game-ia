@@ -1,6 +1,8 @@
 var Cloud = me.Entity.extend({
 
     init: function(x, zi, ze, z) {
+
+        var self = this;
         
         if(x == undefined) {
             x = 0;
@@ -38,7 +40,15 @@ var Cloud = me.Entity.extend({
 
         this.body.collisionType = me.collision.types.NO_OBJECT
 
+        this.removed = false;
         this.isKinematic = true;
+
+        me.timer.setTimeout(function() {
+            if(!self.removed) {
+                me.game.world.removeChild(self);
+            }
+        // }, 8000);
+        }, 24000 / game.vel.x);
     },
 
     update: function(dt) {
@@ -52,6 +62,7 @@ var Cloud = me.Entity.extend({
             me.game.world.addChild(new Cloud(limit-this.body.accel.x, this.zi, this.ze), this.z);
         }
         if(limit <= 1) {
+            this.removed = true;
             me.game.world.removeChild(this);
         }
 
