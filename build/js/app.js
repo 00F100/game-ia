@@ -33785,12 +33785,14 @@ var game = {
         { name: "cloud2", type:"image", src:"data/img/cloud2.png" },
         { name: "cloud3", type:"image", src:"data/img/cloud3.png" },
         { name: "player", type:"image", src:"data/img/player.png" },
-        { name: "enemyCacti", type:"image", src:"data/img/enemyCacti.png" }
+        { name: "enemyCacti", type:"image", src:"data/img/enemyCacti.png" },
+        { name: "enemyFly", type:"image", src:"data/img/enemyFly.png" }
     ],
 
     onload: function()
     {
         if (!me.video.init(game.res.width, game.res.height, {wrapper : "screen", scale : "auto"})) {
+        // if (!me.video.init(game.res.width, game.res.height, {wrapper : "screen"})) {
             alert("Your browser does not support HTML5 canvas.");
             return;
         }
@@ -33801,6 +33803,7 @@ var game = {
 
     loaded: function () {
         me.state.set(me.state.PLAY, new PlayScreen());
+        me.input.bindKey(me.input.KEY.DOWN, "duck", true);
         me.input.bindKey(me.input.KEY.UP, "jump", true);
         me.input.bindKey(me.input.KEY.SPACE, "jump", true);
         me.state.change(me.state.PLAY);
@@ -33810,6 +33813,7 @@ var game = {
 var Cacti = me.Entity.extend({
 
     init: function(x, zi, ze, z) {
+        var self = this;
         this.z = z;
         this.zi = zi;
         this.ze = ze;
@@ -33830,7 +33834,7 @@ var Cacti = me.Entity.extend({
             ]
         );
         
-        this.body.setVelocity(2,0);
+        this.body.setVelocity(3 * game.vel.x,0);
 
         this.renderable = new me.Sprite(0, 0, {
             image: me.loader.getImage('cacti'),
@@ -33839,6 +33843,16 @@ var Cacti = me.Entity.extend({
         });
 
         this.body.collisionType = me.collision.types.NO_OBJECT
+
+        this.removed = false;
+        this.isKinematic = true;
+
+        me.timer.setTimeout(function() {
+            if(!self.removed) {
+                me.game.world.removeChild(self);
+            }
+        // }, 5000);
+        }, 15000 / game.vel.x);
     },
 
     update: function(dt) {
@@ -33852,6 +33866,7 @@ var Cacti = me.Entity.extend({
             me.game.world.addChild(new Cacti(limit-this.body.accel.x, this.zi, this.ze), this.z);
         }
         if(limit <= 1) {
+            this.removed = true;
             me.game.world.removeChild(this);
         }
 
@@ -33863,13 +33878,17 @@ var Cacti = me.Entity.extend({
 var Cloud = me.Entity.extend({
 
     init: function(x, zi, ze, z) {
-        this.z = z;
-        this.zi = zi;
-        this.ze = ze;
+
+        var self = this;
+        
         if(x == undefined) {
             x = 0;
         }
-        this.nextFrame = false;
+        
+        this.z = z;
+        this.zi = zi;
+        this.ze = ze;
+
         me.Entity.prototype.init.apply(this,
             [
                 x, 
@@ -33882,8 +33901,11 @@ var Cloud = me.Entity.extend({
                 }
             ]
         );
+        this.nextFrame = false;
+        this.alwaysUpdate = true;
         
-        this.body.setVelocity(1,0);
+        this.body.setVelocity(1 * game.vel.x,0);
+
 
         this.renderable = new me.Sprite(0, 0, {
             image: me.loader.getImage('cloud' + me.Math.random(1, 3)),
@@ -33892,6 +33914,16 @@ var Cloud = me.Entity.extend({
         });
 
         this.body.collisionType = me.collision.types.NO_OBJECT
+
+        this.removed = false;
+        this.isKinematic = true;
+
+        me.timer.setTimeout(function() {
+            if(!self.removed) {
+                me.game.world.removeChild(self);
+            }
+        // }, 8000);
+        }, 24000 / game.vel.x);
     },
 
     update: function(dt) {
@@ -33905,6 +33937,7 @@ var Cloud = me.Entity.extend({
             me.game.world.addChild(new Cloud(limit-this.body.accel.x, this.zi, this.ze), this.z);
         }
         if(limit <= 1) {
+            this.removed = true;
             me.game.world.removeChild(this);
         }
 
@@ -33932,6 +33965,8 @@ var EnemyCacti = me.Entity.extend({
         
         this.body.setVelocity(4,0);
 
+        // this.alwaysUpdate = true;
+
         this.renderable = new me.Sprite(0, 0, {
             image: me.loader.getImage('enemyCacti'),
             framewidth: 30,
@@ -33939,6 +33974,52 @@ var EnemyCacti = me.Entity.extend({
         });
 
         this.body.collisionType = me.collision.types.ENEMY_OBJECT
+
+        this.isKinematic = false;
+    },
+
+    update: function(dt) {
+        this.body.vel.x += -this.body.accel.x * me.timer.tick;
+
+        var limit = this.body.ancestor.pos._x + this.body.width;
+        if(limit <= 1) {
+            me.game.world.removeChild(this);
+        }
+        this.body.update(dt);
+
+        return (me.Entity.prototype.update.apply(this, [dt]) || this.body.vel.x !== 0 || this.body.vel.y !== 0);
+    }
+});
+var EnemyFly = me.Entity.extend({
+
+    init: function() {
+        me.Entity.prototype.init.apply(this,
+            [
+                600, 
+                200,
+                {
+                    width : 75,
+                    height : 36,
+                    shapes : [ new me.Rect(0, 0, 75, 36) ],
+                    framewidth: 75,
+                    frameheight: 36
+                }
+            ]
+        );
+        
+        this.body.setVelocity(4,0);
+
+        // this.alwaysUpdate = true;
+
+        this.renderable = new me.Sprite(0, 0, {
+            image: me.loader.getImage('enemyFly'),
+            framewidth: 75,
+            frameheight: 36
+        });
+
+        this.body.collisionType = me.collision.types.ENEMY_OBJECT
+
+        this.isKinematic = false;
     },
 
     update: function(dt) {
@@ -34040,6 +34121,8 @@ var HumanPlayer = me.Entity.extend({
         this.entityWidth = 74;
         this.entityHeight = 89;
 
+        // Vf(2) = Vi(2) + 2 * a * D
+
         me.Entity.prototype.init.apply(this,
             [
                 this.startPoint.x, this.startPoint.y,
@@ -34053,45 +34136,53 @@ var HumanPlayer = me.Entity.extend({
             ]
         );
 
-        this.body.setVelocity(0, 20);
-
+        this.body.gravity.y = 0.17;
+        this.body.setVelocity(0, 6);
+        this.alwaysUpdate = true;
         this.renderable = new me.Sprite(0, 0, {
             image: me.loader.getImage('player'),
             framewidth: this.entityWidth,
             frameheight: this.entityHeight
         });
 
-        this.renderable.addAnimation("walk",  [0]);
+        this.renderable.addAnimation("walk",  [0, 1, 2, 3]);
         this.renderable.addAnimation("jump",  [5]);
+        this.renderable.addAnimation("duck",  [4]);
         // this.renderable.addAnimation("die",  [5]);
-        // this.renderable.addAnimation("duck",  [4]);
         this.renderable.setCurrentAnimation("walk");
-        // this.renderable.setCurrentAnimation("jump");
 
         this.body.collisionType = me.collision.types.PLAYER_OBJECT;
+
+        this.isKinematic = false;
     },
 
     update : function (dt) {
-
-        // if(this.renderable.isCurrentAnimation("duck")) {
-        //     this.body.height = 130;
-        // } else {
-        //     this.body.height = 90;
-        // }
-        // this.body.vel.y = 0;
         if(this.alive) {
+            var self = this;
             if (me.input.isKeyPressed('jump'))
             {
                 if (!this.body.jumping && !this.body.falling)
                 {
-                    var self = this;
                     this.renderable.setCurrentAnimation("jump");
                     this.body.vel.y = -this.body.maxVel.y * me.timer.tick;
                     this.body.jumping = true;
                     me.timer.setTimeout(function() {
                         self.renderable.setCurrentAnimation("walk");
-                    }, 500);
+                    }, 1000);
                 }
+            } else if (!this.body.jumping && me.input.isKeyPressed('duck')) {
+                this.body.shapes[0].points[2].y = 70;
+                this.body.shapes[0].points[3].y = 70;
+                console.log(this.body);
+
+                this.renderable.setCurrentAnimation("duck");
+                me.timer.setTimeout(function() {
+
+                    self.body.shapes[0].points[2].y = 89;
+                    self.body.shapes[0].points[3].y = 89;
+                    self.renderable.setCurrentAnimation("walk");
+
+                }, 500);
             }
         }
 
@@ -34123,6 +34214,7 @@ var HumanPlayer = me.Entity.extend({
 var Plant = me.Entity.extend({
 
     init: function(x, zi, ze, z) {
+        var self = this;
         this.z = z;
         this.zi = zi;
         this.ze = ze;
@@ -34143,7 +34235,9 @@ var Plant = me.Entity.extend({
             ]
         );
         
-        this.body.setVelocity(2,0);
+        this.body.setVelocity(3 * game.vel.x,0);
+
+        // this.alwaysUpdate = true;
 
         this.renderable = new me.Sprite(0, 0, {
             image: me.loader.getImage('plant1'),
@@ -34151,7 +34245,17 @@ var Plant = me.Entity.extend({
             frameheight: 70
         });
 
-        this.body.collisionType = me.collision.types.NO_OBJECT
+        this.body.collisionType = me.collision.types.NO_OBJECT;
+
+        this.removed = false;
+        this.isKinematic = true;
+
+        me.timer.setTimeout(function() {
+            if(!self.removed) {
+                me.game.world.removeChild(self);
+            }
+        // }, 5000);
+        }, 15000 / game.vel.x);
     },
 
     update: function(dt) {
@@ -34165,6 +34269,7 @@ var Plant = me.Entity.extend({
             me.game.world.addChild(new Plant(limit-this.body.accel.x, this.zi, this.ze), this.z);
         }
         if(limit <= 1) {
+            this.removed = true;
             me.game.world.removeChild(this);
         }
 
@@ -34176,6 +34281,8 @@ var Plant = me.Entity.extend({
 var Sidewalk = me.Entity.extend({
 
     init: function(x) {
+        var self = this;
+
         if(x == undefined) {
             x = 0;
         }
@@ -34194,9 +34301,9 @@ var Sidewalk = me.Entity.extend({
             ]
         );
         
-        this.body.setVelocity(2 * game.vel.x,0);
+        this.body.setVelocity(3 * game.vel.x,0);
 
-        this.alwaysUpdate = true;
+        // this.alwaysUpdate = true;
 
         this.renderable = new me.Sprite(0, 0, {
             image: me.loader.getImage('sidewalk'),
@@ -34204,10 +34311,26 @@ var Sidewalk = me.Entity.extend({
             frameheight: 32
         });
 
-        this.body.collisionType = me.collision.types.WORLD_SHAPE
+        this.body.collisionType = me.collision.types.WORLD_SHAPE;
+
+        this.removed = false;
+        this.isKinematic = false;
+
+        me.timer.setTimeout(function() {
+            if(!self.removed) {
+                me.game.world.removeChild(self);
+            }
+        // }, 5000);
+        }, 15000 / game.vel.x);
     },
 
     update: function(dt) {
+        if(game.vel.x <= 3.5) {
+            game.vel.x += 0.0003;
+        } else {
+            game.vel.x = 3.5;
+        }
+        console.log(game.vel.x);
         this.body.vel.x += -this.body.accel.x * me.timer.tick;
 
         var limit = this.body.ancestor.pos._x + this.body.width;
@@ -34218,6 +34341,7 @@ var Sidewalk = me.Entity.extend({
             me.game.world.addChild(new Sidewalk(limit-this.body.accel.x));
         }
         if(limit <= 1) {
+            this.removed = true;
             me.game.world.removeChild(this);
         }
 
@@ -34229,15 +34353,21 @@ var Sidewalk = me.Entity.extend({
         return false;
     }
 });
-var PlayScreen = me.Stage.extend( {
+var PlayScreen = me.ScreenObject.extend( {
+
+    init: function() {
+        me.ScreenObject.prototype.init.apply(this);
+    },
+
     onResetEvent: function() {
         me.game.world.addChild(new me.ColorLayer("background", "#ffe2b7", 0), 0);
-        me.game.world.addChild(new Cacti(0, 100, 1000, 1), 1);
-        me.game.world.addChild(new Plant(0, 100, 1000, 1), 1);
-        me.game.world.addChild(new Cloud(0, 100, 1000, 1), 1);
+        // me.game.world.addChild(new Cacti(0, 100, 1000, 1), 1);
+        // me.game.world.addChild(new Plant(0, 100, 1000, 1), 1);
+        me.game.world.addChild(new Cloud(0, 80, 1000, 1), 1);
         me.game.world.addChild(new HumanPlayer(), 20);
         me.game.world.addChild(new Sidewalk(), 60);
-        me.game.world.addChild(new EnemyCacti(), 2)
+        // me.game.world.addChild(new EnemyCacti(), 2)
+        me.game.world.addChild(new EnemyFly(), 2)
     },
     
     

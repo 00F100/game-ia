@@ -38,7 +38,8 @@ var game = {
         { name: "cloud2", type:"image", src:"data/img/cloud2.png" },
         { name: "cloud3", type:"image", src:"data/img/cloud3.png" },
         { name: "player", type:"image", src:"data/img/player.png" },
-        { name: "enemyCacti", type:"image", src:"data/img/enemyCacti.png" }
+        { name: "enemyCacti", type:"image", src:"data/img/enemyCacti.png" },
+        { name: "enemyFly", type:"image", src:"data/img/enemyFly.png" }
     ],
 
     onload: function()
@@ -55,9 +56,9 @@ var game = {
 
     loaded: function () {
         me.state.set(me.state.PLAY, new PlayScreen());
-        me.input.bindKey(me.input.KEY.DOWN, "duck", true);
-        me.input.bindKey(me.input.KEY.UP, "jump", true);
-        me.input.bindKey(me.input.KEY.SPACE, "jump", true);
+        me.input.bindKey(me.input.KEY.DOWN, "duck");
+        me.input.bindKey(me.input.KEY.UP, "jump");
+        me.input.bindKey(me.input.KEY.SPACE, "jump");
         me.state.change(me.state.PLAY);
     }
 };

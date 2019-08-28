@@ -19,7 +19,7 @@ var HumanPlayer = me.Entity.extend({
                 {
                     width : this.entityWidth,
                     height : this.entityHeight,
-                    shapes : [ new me.Rect(0, 0, this.entityWidth, this.entityHeight) ],
+                    shapes : [ new me.Rect(0, 0, this.entityWidth-10, this.entityHeight) ],
                     framewidth: this.entityWidth,
                     frameheight: this.entityHeight
                 }
@@ -49,30 +49,37 @@ var HumanPlayer = me.Entity.extend({
     update : function (dt) {
         if(this.alive) {
             var self = this;
-            if (me.input.isKeyPressed('jump'))
-            {
-                if (!this.body.jumping && !this.body.falling)
-                {
+            if (me.input.isKeyPressed('jump')) {
+                if (!this.body.jumping && !this.body.falling) {
                     this.renderable.setCurrentAnimation("jump");
                     this.body.vel.y = -this.body.maxVel.y * me.timer.tick;
                     this.body.jumping = true;
-                    me.timer.setTimeout(function() {
-                        self.renderable.setCurrentAnimation("walk");
-                    }, 1000);
                 }
-            } else if (!this.body.jumping && me.input.isKeyPressed('duck')) {
-                this.body.shapes[0].points[2].y = 70;
-                this.body.shapes[0].points[3].y = 70;
-                console.log(this.body);
-
+            } else if (me.input.isKeyPressed('duck')) {
+                this.body.removeShapeAt(0);
+                // this.body.gravity.y = 1;
+                this.body.addShape(new me.Rect(0, 0, this.entityWidth-10, 70));
+                // this.body.gravity.y = 0.17;
+                // this.body.shapes = [];
+                // this.body.addShape(new me.Rect(0, 0, this.entityWidth-10, 85));
+                // this.body.shapes[0].points[2].y = 70;
+                // this.body.shapes[0].points[3].y = 70;
                 this.renderable.setCurrentAnimation("duck");
-                me.timer.setTimeout(function() {
-
-                    self.body.shapes[0].points[2].y = 89;
-                    self.body.shapes[0].points[3].y = 89;
-                    self.renderable.setCurrentAnimation("walk");
-
-                }, 500);
+            } else {
+                if(!this.renderable.isCurrentAnimation("walk") && !this.body.jumping && !this.body.falling) {
+                    this.body.removeShapeAt(0);
+                    // this.body.gravity.y = 1;
+                    this.body.addShape(new me.Rect(0, 0, this.entityWidth-10, this.entityHeight));
+                    // me.timer.setTimeout(function() {
+                        // self.body.gravity.y = 0.17;
+                    // }, 500);
+                    // this.body.gravity.y = 0.17;
+                    // this.body.shapes = [];
+                    // this.body.addShape(new me.Rect(0, 0, this.entityWidth-10, this.entityHeight));
+                    // self.body.shapes[0].points[2].y = 89;
+                    // self.body.shapes[0].points[3].y = 89;
+                    this.renderable.setCurrentAnimation("walk");
+                }
             }
         }
 

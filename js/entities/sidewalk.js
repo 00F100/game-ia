@@ -48,11 +48,11 @@ var Sidewalk = me.Entity.extend({
 
     update: function(dt) {
         if(game.vel.x <= 3.5) {
-            game.vel.x += 0.0003;
+            game.vel.x += 0.0001;
         } else {
             game.vel.x = 3.5;
         }
-        console.log(game.vel.x);
+        // console.log(game.vel.x);
         this.body.vel.x += -this.body.accel.x * me.timer.tick;
 
         var limit = this.body.ancestor.pos._x + this.body.width;

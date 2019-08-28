@@ -80,6 +80,11 @@ game.resources = [
         "src": "data/img/enemyCacti.png"
     },
     {
+        "name": "enemyFly",
+        "type": "image",
+        "src": "data/img/enemyFly.png"
+    },
+    {
         "name": "area01_level_tiles",
         "type": "image",
         "src": "data/img/map/area01_level_tiles.png"
@@ -158,6 +163,11 @@ game.resources = [
         "name": "wheelie_right",
         "type": "image",
         "src": "data/img/sprite/wheelie_right.png"
+    },
+    {
+        "name": "enemyFly",
+        "type": "json",
+        "src": "data/img/sprite/enemyFly.json"
     },
     {
         "name": "area01",
