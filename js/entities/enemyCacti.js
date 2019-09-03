@@ -1,6 +1,7 @@
 var EnemyCacti = me.Entity.extend({
 
     init: function() {
+        var self = this;
         this._super(
             me.Entity,
             "init",
@@ -17,7 +18,7 @@ var EnemyCacti = me.Entity.extend({
             ]
         );
         
-        this.body.setVelocity(4,0);
+        this.body.setVelocity(4 * game.vel.x,0);
 
         // this.alwaysUpdate = true;
 
@@ -29,7 +30,15 @@ var EnemyCacti = me.Entity.extend({
 
         this.body.collisionType = me.collision.types.ENEMY_OBJECT
 
+        this.removed = false;
         this.isKinematic = false;
+
+        me.timer.setTimeout(function() {
+            if(!self.removed) {
+                me.game.world.removeChild(self);
+            }
+        // }, 8000);
+        }, 24000 / game.vel.x);
     },
 
     update: function(dt) {
@@ -37,6 +46,7 @@ var EnemyCacti = me.Entity.extend({
 
         var limit = this.body.ancestor.pos._x + this.body.width;
         if(limit <= 1) {
+            this.removed = true;
             me.game.world.removeChild(this);
         }
         this.body.update(dt);

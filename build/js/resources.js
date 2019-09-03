@@ -165,11 +165,6 @@ game.resources = [
         "src": "data/img/sprite/wheelie_right.png"
     },
     {
-        "name": "enemyFly",
-        "type": "json",
-        "src": "data/img/sprite/enemyFly.json"
-    },
-    {
         "name": "area01",
         "type": "tmx",
         "src": "data/map/area01.tmx"

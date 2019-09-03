@@ -33803,9 +33803,9 @@ var game = {
 
     loaded: function () {
         me.state.set(me.state.PLAY, new PlayScreen());
-        me.input.bindKey(me.input.KEY.DOWN, "duck", true);
-        me.input.bindKey(me.input.KEY.UP, "jump", true);
-        me.input.bindKey(me.input.KEY.SPACE, "jump", true);
+        me.input.bindKey(me.input.KEY.DOWN, "duck");
+        me.input.bindKey(me.input.KEY.UP, "jump");
+        me.input.bindKey(me.input.KEY.SPACE, "jump");
         me.state.change(me.state.PLAY);
     }
 };
@@ -33996,7 +33996,7 @@ var EnemyFly = me.Entity.extend({
         me.Entity.prototype.init.apply(this,
             [
                 600, 
-                200,
+                330,
                 {
                     width : 75,
                     height : 36,
@@ -34121,7 +34121,14 @@ var HumanPlayer = me.Entity.extend({
         this.entityWidth = 74;
         this.entityHeight = 89;
 
-        // Vf(2) = Vi(2) + 2 * a * D
+        // Equação de Torricelli
+        // 
+        // V = velocidade final 
+        // V0 = velocidade inicial 
+        // a = aceleração 
+        // ∆S = variação de espaço
+        //
+        // V² = V0² + 2 * a * D
 
         me.Entity.prototype.init.apply(this,
             [
@@ -34129,7 +34136,7 @@ var HumanPlayer = me.Entity.extend({
                 {
                     width : this.entityWidth,
                     height : this.entityHeight,
-                    shapes : [ new me.Rect(0, 0, this.entityWidth, this.entityHeight) ],
+                    shapes : [ new me.Rect(0, 0, this.entityWidth-10, this.entityHeight) ],
                     framewidth: this.entityWidth,
                     frameheight: this.entityHeight
                 }
@@ -34148,41 +34155,47 @@ var HumanPlayer = me.Entity.extend({
         this.renderable.addAnimation("walk",  [0, 1, 2, 3]);
         this.renderable.addAnimation("jump",  [5]);
         this.renderable.addAnimation("duck",  [4]);
-        // this.renderable.addAnimation("die",  [5]);
-        this.renderable.setCurrentAnimation("walk");
+        
+        this.runWalk();
 
         this.body.collisionType = me.collision.types.PLAYER_OBJECT;
 
         this.isKinematic = false;
     },
 
+    runJump: function() {
+        this.renderable.setCurrentAnimation("jump");
+        this.body.vel.y = -this.body.maxVel.y * me.timer.tick;
+        this.body.jumping = true;
+    },
+
+    runDuck: function() {
+        this.body.shapes[0].points[0].y = 20;
+        this.body.shapes[0].points[1].y = 20;
+        this.body.pos.y = 20;
+        this.renderable.setCurrentAnimation("duck");
+    },
+
+    runWalk: function() {
+        this.body.pos.y = 0;
+        this.body.shapes[0].points[0].y = 0;
+        this.body.shapes[0].points[1].y = 0;
+        this.renderable.setCurrentAnimation("walk");
+    },
+
     update : function (dt) {
         if(this.alive) {
             var self = this;
-            if (me.input.isKeyPressed('jump'))
-            {
-                if (!this.body.jumping && !this.body.falling)
-                {
-                    this.renderable.setCurrentAnimation("jump");
-                    this.body.vel.y = -this.body.maxVel.y * me.timer.tick;
-                    this.body.jumping = true;
-                    me.timer.setTimeout(function() {
-                        self.renderable.setCurrentAnimation("walk");
-                    }, 1000);
+            if (me.input.isKeyPressed('jump')) {
+                if (!this.body.jumping && !this.body.falling) {
+                    this.runJump();
                 }
-            } else if (!this.body.jumping && me.input.isKeyPressed('duck')) {
-                this.body.shapes[0].points[2].y = 70;
-                this.body.shapes[0].points[3].y = 70;
-                console.log(this.body);
-
-                this.renderable.setCurrentAnimation("duck");
-                me.timer.setTimeout(function() {
-
-                    self.body.shapes[0].points[2].y = 89;
-                    self.body.shapes[0].points[3].y = 89;
-                    self.renderable.setCurrentAnimation("walk");
-
-                }, 500);
+            } else if (me.input.isKeyPressed('duck')) {
+                this.runDuck();
+            } else {
+                if(!this.renderable.isCurrentAnimation("walk") && !this.body.jumping && !this.body.falling) {
+                    this.runWalk();
+                }
             }
         }
 
@@ -34326,11 +34339,11 @@ var Sidewalk = me.Entity.extend({
 
     update: function(dt) {
         if(game.vel.x <= 3.5) {
-            game.vel.x += 0.0003;
+            game.vel.x += 0.0001;
         } else {
             game.vel.x = 3.5;
         }
-        console.log(game.vel.x);
+        // console.log(game.vel.x);
         this.body.vel.x += -this.body.accel.x * me.timer.tick;
 
         var limit = this.body.ancestor.pos._x + this.body.width;
@@ -34361,13 +34374,13 @@ var PlayScreen = me.ScreenObject.extend( {
 
     onResetEvent: function() {
         me.game.world.addChild(new me.ColorLayer("background", "#ffe2b7", 0), 0);
-        // me.game.world.addChild(new Cacti(0, 100, 1000, 1), 1);
-        // me.game.world.addChild(new Plant(0, 100, 1000, 1), 1);
+        me.game.world.addChild(new Cacti(0, 100, 1000, 1), 1);
+        me.game.world.addChild(new Plant(0, 100, 1000, 1), 1);
         me.game.world.addChild(new Cloud(0, 80, 1000, 1), 1);
         me.game.world.addChild(new HumanPlayer(), 20);
         me.game.world.addChild(new Sidewalk(), 60);
         // me.game.world.addChild(new EnemyCacti(), 2)
-        me.game.world.addChild(new EnemyFly(), 2)
+        // me.game.world.addChild(new EnemyFly(), 2)
     },
     
     

@@ -9,7 +9,14 @@ var HumanPlayer = me.Entity.extend({
         this.entityWidth = 74;
         this.entityHeight = 89;
 
-        // Vf(2) = Vi(2) + 2 * a * D
+        // Equação de Torricelli
+        // 
+        // V = velocidade final 
+        // V0 = velocidade inicial 
+        // a = aceleração 
+        // ∆S = variação de espaço
+        //
+        // V² = V0² + 2 * a * D
 
         this._super(
             me.Entity,
@@ -19,7 +26,7 @@ var HumanPlayer = me.Entity.extend({
                 {
                     width : this.entityWidth,
                     height : this.entityHeight,
-                    shapes : [ new me.Rect(0, 0, this.entityWidth-10, this.entityHeight) ],
+                    shapes : [ new me.Rect(0, 0, this.entityWidth-20, this.entityHeight) ],
                     framewidth: this.entityWidth,
                     frameheight: this.entityHeight
                 }
@@ -38,12 +45,32 @@ var HumanPlayer = me.Entity.extend({
         this.renderable.addAnimation("walk",  [0, 1, 2, 3]);
         this.renderable.addAnimation("jump",  [5]);
         this.renderable.addAnimation("duck",  [4]);
-        // this.renderable.addAnimation("die",  [5]);
-        this.renderable.setCurrentAnimation("walk");
+        
+        this.runWalk();
 
         this.body.collisionType = me.collision.types.PLAYER_OBJECT;
 
         this.isKinematic = false;
+    },
+
+    runJump: function() {
+        this.renderable.setCurrentAnimation("jump");
+        this.body.vel.y = -this.body.maxVel.y * me.timer.tick;
+        this.body.jumping = true;
+    },
+
+    runDuck: function() {
+        this.body.shapes[0].points[0].y = 20;
+        this.body.shapes[0].points[1].y = 20;
+        this.body.pos.y = 20;
+        this.renderable.setCurrentAnimation("duck");
+    },
+
+    runWalk: function() {
+        this.body.pos.y = 0;
+        this.body.shapes[0].points[0].y = 0;
+        this.body.shapes[0].points[1].y = 0;
+        this.renderable.setCurrentAnimation("walk");
     },
 
     update : function (dt) {
@@ -51,34 +78,13 @@ var HumanPlayer = me.Entity.extend({
             var self = this;
             if (me.input.isKeyPressed('jump')) {
                 if (!this.body.jumping && !this.body.falling) {
-                    this.renderable.setCurrentAnimation("jump");
-                    this.body.vel.y = -this.body.maxVel.y * me.timer.tick;
-                    this.body.jumping = true;
+                    this.runJump();
                 }
             } else if (me.input.isKeyPressed('duck')) {
-                this.body.removeShapeAt(0);
-                // this.body.gravity.y = 1;
-                this.body.addShape(new me.Rect(0, 0, this.entityWidth-10, 70));
-                // this.body.gravity.y = 0.17;
-                // this.body.shapes = [];
-                // this.body.addShape(new me.Rect(0, 0, this.entityWidth-10, 85));
-                // this.body.shapes[0].points[2].y = 70;
-                // this.body.shapes[0].points[3].y = 70;
-                this.renderable.setCurrentAnimation("duck");
+                this.runDuck();
             } else {
                 if(!this.renderable.isCurrentAnimation("walk") && !this.body.jumping && !this.body.falling) {
-                    this.body.removeShapeAt(0);
-                    // this.body.gravity.y = 1;
-                    this.body.addShape(new me.Rect(0, 0, this.entityWidth-10, this.entityHeight));
-                    // me.timer.setTimeout(function() {
-                        // self.body.gravity.y = 0.17;
-                    // }, 500);
-                    // this.body.gravity.y = 0.17;
-                    // this.body.shapes = [];
-                    // this.body.addShape(new me.Rect(0, 0, this.entityWidth-10, this.entityHeight));
-                    // self.body.shapes[0].points[2].y = 89;
-                    // self.body.shapes[0].points[3].y = 89;
-                    this.renderable.setCurrentAnimation("walk");
+                    this.runWalk();
                 }
             }
         }
@@ -101,6 +107,7 @@ var HumanPlayer = me.Entity.extend({
                 // this.hud.continue = false;
                 this.body.vel.x = 0;
                 this.body.vel.y = 0;
+                // game.vel.x = 0;
                 // this.renderable.setCurrentAnimation("die");
                 // me.audio.play("errou");
                 break;
