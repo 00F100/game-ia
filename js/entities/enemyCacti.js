@@ -42,12 +42,16 @@ var EnemyCacti = me.Entity.extend({
     },
 
     update: function(dt) {
-        this.body.vel.x += -this.body.accel.x * me.timer.tick;
+        if(game.alive) {
+            this.body.vel.x += -this.body.accel.x * me.timer.tick;
 
-        var limit = this.body.ancestor.pos._x + this.body.width;
-        if(limit <= 1) {
-            this.removed = true;
-            me.game.world.removeChild(this);
+            var limit = this.body.ancestor.pos._x + this.body.width;
+            if(limit <= 1) {
+                this.removed = true;
+                me.game.world.removeChild(this);
+            }
+        } else {
+            this.body.setVelocity(0, 0);
         }
         this.body.update(dt);
 

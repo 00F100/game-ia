@@ -1,11 +1,8 @@
 var Sidewalk = me.Entity.extend({
 
-    init: function(x) {
+    init: function(x, z) {
         var self = this;
-
-        if(x == undefined) {
-            x = 0;
-        }
+        this.z = z;
         this.nextFrame = false;
         this._super(
             me.Entity,
@@ -47,26 +44,31 @@ var Sidewalk = me.Entity.extend({
     },
 
     update: function(dt) {
-        if(game.vel.x <= 3.5) {
-            game.vel.x += 0.0001;
+        if(game.alive) {
+            if(game.vel.x <= 3.5) {
+                game.vel.x += 0.0001;
+            } else {
+                game.vel.x = 3.5;
+            }
+            // console.log(this.body.accel);
+            // console.log(game.vel.x);
+            this.body.vel.x += -this.body.accel.x * me.timer.tick;
+
+            var limit = this.body.ancestor.pos._x + this.body.width;
+            var limitX = game.res.width - (this.body.ancestor.pos._x + this.body.width);
+
+            if(limitX > 0 && !this.nextFrame) {
+                this.nextFrame = true;
+                me.game.world.addChild(new Sidewalk(limit-this.body.accel.x), this.z);
+            }
+            if(limit <= 1) {
+                this.removed = true;
+                me.game.world.removeChild(this);
+            }
         } else {
-            game.vel.x = 3.5;
+            this.body.setVelocity(0, 0);
         }
-        // console.log(game.vel.x);
-        this.body.vel.x += -this.body.accel.x * me.timer.tick;
-
-        var limit = this.body.ancestor.pos._x + this.body.width;
-        var limitX = game.res.width - (this.body.ancestor.pos._x + this.body.width);
-
-        if(limitX > 0 && !this.nextFrame) {
-            this.nextFrame = true;
-            me.game.world.addChild(new Sidewalk(limit-this.body.accel.x));
-        }
-        if(limit <= 1) {
-            this.removed = true;
-            me.game.world.removeChild(this);
-        }
-
+        
         this.body.update(dt);
 
         return (this._super(me.Entity, 'update', [dt]) || this.body.vel.x !== 0 || this.body.vel.y !== 0);

@@ -48,18 +48,22 @@ var Plant = me.Entity.extend({
     },
 
     update: function(dt) {
-        this.body.vel.x += -this.body.accel.x * me.timer.tick;
+        if(game.alive) {
+            this.body.vel.x += -this.body.accel.x * me.timer.tick;
 
-        var limit = this.body.ancestor.pos._x + this.body.width;
-        var limitX = game.res.width - (this.body.ancestor.pos._x + this.body.width);
+            var limit = this.body.ancestor.pos._x + this.body.width;
+            var limitX = game.res.width - (this.body.ancestor.pos._x + this.body.width);
 
-        if(limitX > 0 && !this.nextFrame) {
-            this.nextFrame = true;
-            me.game.world.addChild(new Plant(limit-this.body.accel.x, this.zi, this.ze), this.z);
-        }
-        if(limit <= 1) {
-            this.removed = true;
-            me.game.world.removeChild(this);
+            if(limitX > 0 && !this.nextFrame) {
+                this.nextFrame = true;
+                me.game.world.addChild(new Plant(limit-this.body.accel.x, this.zi, this.ze), this.z);
+            }
+            if(limit <= 1) {
+                this.removed = true;
+                me.game.world.removeChild(this);
+            }
+        } else {
+            this.body.setVelocity(0, 0);
         }
 
         this.body.update(dt);

@@ -9,15 +9,6 @@ var HumanPlayer = me.Entity.extend({
         this.entityWidth = 74;
         this.entityHeight = 89;
 
-        // Equação de Torricelli
-        // 
-        // V = velocidade final 
-        // V0 = velocidade inicial 
-        // a = aceleração 
-        // ∆S = variação de espaço
-        //
-        // V² = V0² + 2 * a * D
-
         this._super(
             me.Entity,
             "init",
@@ -107,6 +98,7 @@ var HumanPlayer = me.Entity.extend({
                 // this.hud.continue = false;
                 this.body.vel.x = 0;
                 this.body.vel.y = 0;
+                game.alive = false;
                 // game.vel.x = 0;
                 // this.renderable.setCurrentAnimation("die");
                 // me.audio.play("errou");

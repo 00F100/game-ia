@@ -5,6 +5,8 @@ var game = {
         height: 480
     },
 
+    alive: true,
+
     vel: {
         x: 1,
         y: 0
@@ -39,13 +41,15 @@ var game = {
         { name: "cloud3", type:"image", src:"data/img/cloud3.png" },
         { name: "player", type:"image", src:"data/img/player.png" },
         { name: "enemyCacti", type:"image", src:"data/img/enemyCacti.png" },
-        { name: "enemyFly", type:"image", src:"data/img/enemyFly.png" }
+        { name: "enemyFly", type:"image", src:"data/img/enemyFly.png" },
+        { name: "PressStart2P", type:"image", src: "data/fnt/PressStart2P.png" },
+        { name: "PressStart2P", type:"binary", src: "data/fnt/PressStart2P.fnt"}
     ],
 
     onload: function()
     {
-        if (!me.video.init(game.res.width, game.res.height, {wrapper : "screen", scale : "auto"})) {
-        // if (!me.video.init(game.res.width, game.res.height, {wrapper : "screen"})) {
+        // if (!me.video.init(game.res.width, game.res.height, {wrapper : "screen", scale : "auto"})) {
+        if (!me.video.init(game.res.width, game.res.height, {wrapper : "screen"})) {
             alert("Your browser does not support HTML5 canvas.");
             return;
         }

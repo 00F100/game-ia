@@ -33949,6 +33949,7 @@ var Cloud = me.Entity.extend({
 var EnemyCacti = me.Entity.extend({
 
     init: function() {
+        var self = this;
         me.Entity.prototype.init.apply(this,
             [
                 639, 
@@ -33963,7 +33964,7 @@ var EnemyCacti = me.Entity.extend({
             ]
         );
         
-        this.body.setVelocity(4,0);
+        this.body.setVelocity(4 * game.vel.x,0);
 
         // this.alwaysUpdate = true;
 
@@ -33975,7 +33976,15 @@ var EnemyCacti = me.Entity.extend({
 
         this.body.collisionType = me.collision.types.ENEMY_OBJECT
 
+        this.removed = false;
         this.isKinematic = false;
+
+        me.timer.setTimeout(function() {
+            if(!self.removed) {
+                me.game.world.removeChild(self);
+            }
+        // }, 8000);
+        }, 24000 / game.vel.x);
     },
 
     update: function(dt) {
@@ -33983,6 +33992,7 @@ var EnemyCacti = me.Entity.extend({
 
         var limit = this.body.ancestor.pos._x + this.body.width;
         if(limit <= 1) {
+            this.removed = true;
             me.game.world.removeChild(this);
         }
         this.body.update(dt);
@@ -33993,33 +34003,46 @@ var EnemyCacti = me.Entity.extend({
 var EnemyFly = me.Entity.extend({
 
     init: function() {
+        var self = this;
         me.Entity.prototype.init.apply(this,
             [
-                600, 
-                330,
+                630, 
+                340,
                 {
                     width : 75,
-                    height : 36,
-                    shapes : [ new me.Rect(0, 0, 75, 36) ],
+                    height : 33.5,
+                    shapes : [
+                        new me.Rect(-28, 0, 15, 18),
+                        new me.Rect(-12, 0, 40, 33.5),
+                        new me.Rect(28, 0, 15, 18)
+                    ],
                     framewidth: 75,
-                    frameheight: 36
+                    frameheight: 33.5
                 }
             ]
         );
         
-        this.body.setVelocity(4,0);
+        this.body.setVelocity(4 * game.vel.x,0);
 
-        // this.alwaysUpdate = true;
+        this.alwaysUpdate = true;
 
         this.renderable = new me.Sprite(0, 0, {
             image: me.loader.getImage('enemyFly'),
             framewidth: 75,
-            frameheight: 36
+            frameheight: 33.5
         });
 
         this.body.collisionType = me.collision.types.ENEMY_OBJECT
 
+        this.removed = false;
         this.isKinematic = false;
+
+        me.timer.setTimeout(function() {
+            if(!self.removed) {
+                me.game.world.removeChild(self);
+            }
+        // }, 8000);
+        }, 24000 / game.vel.x);
     },
 
     update: function(dt) {
@@ -34027,11 +34050,46 @@ var EnemyFly = me.Entity.extend({
 
         var limit = this.body.ancestor.pos._x + this.body.width;
         if(limit <= 1) {
+            this.removed = true;
             me.game.world.removeChild(this);
         }
         this.body.update(dt);
 
         return (me.Entity.prototype.update.apply(this, [dt]) || this.body.vel.x !== 0 || this.body.vel.y !== 0);
+    }
+});
+var EnemyGenerate = me.Container.extend({
+
+    init: function(limit) {
+        me.Container.prototype.init.apply(this);
+        this.isPersistent = true;
+        this.floating = true;
+        this.name = "EnemyGenerate";
+        this.interval = 0;
+        this.limit = limit;
+        this.hasEnemy = false;
+    },
+    update: function() {
+        if(this.interval >= this.limit) {
+            if(me.Math.random(1, 3)%2 == 0) {
+                this.interval = 0;
+                this.genEnemy();
+            }
+        }
+        this.interval++;
+    },
+
+    genEnemy: function() {
+        if(me.Math.random(1, 3)%2 == 0) {
+            me.game.world.addChild(new EnemyFly(), 2);
+        } else {
+            me.game.world.addChild(new EnemyCacti(), 2);
+            // if(me.Math.random(1, 3)%2 == 0) {
+
+            // } else {
+
+            // }
+        }
     }
 });
 // var HUD = {};
@@ -34136,7 +34194,7 @@ var HumanPlayer = me.Entity.extend({
                 {
                     width : this.entityWidth,
                     height : this.entityHeight,
-                    shapes : [ new me.Rect(0, 0, this.entityWidth-10, this.entityHeight) ],
+                    shapes : [ new me.Rect(0, 0, this.entityWidth-20, this.entityHeight) ],
                     framewidth: this.entityWidth,
                     frameheight: this.entityHeight
                 }
@@ -34217,6 +34275,7 @@ var HumanPlayer = me.Entity.extend({
                 // this.hud.continue = false;
                 this.body.vel.x = 0;
                 this.body.vel.y = 0;
+                // game.vel.x = 0;
                 // this.renderable.setCurrentAnimation("die");
                 // me.audio.play("errou");
                 break;
@@ -34375,12 +34434,13 @@ var PlayScreen = me.ScreenObject.extend( {
     onResetEvent: function() {
         me.game.world.addChild(new me.ColorLayer("background", "#ffe2b7", 0), 0);
         me.game.world.addChild(new Cacti(0, 100, 1000, 1), 1);
-        me.game.world.addChild(new Plant(0, 100, 1000, 1), 1);
+        me.game.world.addChild(new Plant(0, 500, 1000, 1), 1);
         me.game.world.addChild(new Cloud(0, 80, 1000, 1), 1);
         me.game.world.addChild(new HumanPlayer(), 20);
         me.game.world.addChild(new Sidewalk(), 60);
         // me.game.world.addChild(new EnemyCacti(), 2)
         // me.game.world.addChild(new EnemyFly(), 2)
+        me.game.world.addChild(new EnemyGenerate(90));
     },
     
     

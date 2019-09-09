@@ -1,6 +1,7 @@
 var EnemyGenerate = me.Container.extend({
 
-    init: function(limit) {
+    init: function(limit, z) {
+        this.z = z;
         this._super(me.Container, 'init');
         this.isPersistent = true;
         this.floating = true;
@@ -10,7 +11,7 @@ var EnemyGenerate = me.Container.extend({
         this.hasEnemy = false;
     },
     update: function() {
-        if(this.interval >= this.limit) {
+        if(game.alive && this.interval >= this.limit) {
             if(me.Math.random(1, 3)%2 == 0) {
                 this.interval = 0;
                 this.genEnemy();
@@ -21,9 +22,9 @@ var EnemyGenerate = me.Container.extend({
 
     genEnemy: function() {
         if(me.Math.random(1, 3)%2 == 0) {
-            me.game.world.addChild(new EnemyFly(), 2);
+            me.game.world.addChild(new EnemyFly(), this.z);
         } else {
-            me.game.world.addChild(new EnemyCacti(), 2);
+            me.game.world.addChild(new EnemyCacti(), this.z);
             // if(me.Math.random(1, 3)%2 == 0) {
 
             // } else {
