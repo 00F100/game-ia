@@ -46,7 +46,7 @@ var Sidewalk = me.Entity.extend({
                 this.nextFrame = true;
                 me.game.world.addChild(new Sidewalk(limit-this.body.accel.x), this.z);
             }
-            if(limit <= 10) {
+            if(limit <= 15) {
                 this.removed = true;
                 me.game.world.removeChild(this);
             }

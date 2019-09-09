@@ -12,7 +12,7 @@ var EnemyGenerate = me.Container.extend({
     },
     update: function() {
         if(game.alive && this.interval >= this.limit) {
-            if(me.Math.random(1, 3)%2 == 0) {
+            if(me.Math.random(1, 4)%2 == 0) {
                 this.interval = 0;
                 this.genEnemy();
             }
@@ -21,15 +21,10 @@ var EnemyGenerate = me.Container.extend({
     },
 
     genEnemy: function() {
-        if(me.Math.random(1, 3)%2 == 0) {
+        if(me.Math.random(1, 4)%2 == 0) {
             me.game.world.addChild(new EnemyFly(), this.z);
         } else {
             me.game.world.addChild(new EnemyCacti(), this.z);
-            // if(me.Math.random(1, 3)%2 == 0) {
-
-            // } else {
-
-            // }
         }
     }
 });

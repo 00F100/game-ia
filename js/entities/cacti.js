@@ -49,7 +49,7 @@ var Cacti = me.Entity.extend({
                 this.nextFrame = true;
                 me.game.world.addChild(new Cacti(limit-this.body.accel.x, this.zi, this.ze), this.z);
             }
-            if(limit <= 10) {
+            if(limit <= 15) {
                 this.removed = true;
                 me.game.world.removeChild(this);
             }

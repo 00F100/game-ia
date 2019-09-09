@@ -22,7 +22,6 @@ var ScoreItem = me.Renderable.extend({
             var A = 3 * game.vel.x;
             var T = this.interval / 100;
             this.distance += ((A * T) - this.distance);
-            this.velocity  = 0;
         }
     },
     draw: function(renderer) {
