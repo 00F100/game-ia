@@ -36,13 +36,6 @@ var Cacti = me.Entity.extend({
 
         this.removed = false;
         this.isKinematic = true;
-
-        me.timer.setTimeout(function() {
-            if(!self.removed) {
-                me.game.world.removeChild(self);
-            }
-        // }, 5000);
-        }, 15000 / game.vel.x);
     },
 
     update: function(dt) {
@@ -56,7 +49,7 @@ var Cacti = me.Entity.extend({
                 this.nextFrame = true;
                 me.game.world.addChild(new Cacti(limit-this.body.accel.x, this.zi, this.ze), this.z);
             }
-            if(limit <= 1) {
+            if(limit <= 10) {
                 this.removed = true;
                 me.game.world.removeChild(this);
             }

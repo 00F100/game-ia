@@ -67,6 +67,15 @@ var HumanPlayer = me.Entity.extend({
     update : function (dt) {
         if(this.alive) {
             var self = this;
+
+            if (game.vel.x < 2) {
+                this.body.gravity.y = 0.17;
+            } else if(game.vel.x < 3) {
+                this.body.gravity.y = 0.22;
+            } else if (game.vel.x < 4) {
+                this.body.gravity.y = 0.28;
+            }
+
             if (me.input.isKeyPressed('jump')) {
                 if (!this.body.jumping && !this.body.falling) {
                     this.runJump();

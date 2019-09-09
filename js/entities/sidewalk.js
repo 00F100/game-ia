@@ -34,26 +34,11 @@ var Sidewalk = me.Entity.extend({
 
         this.removed = false;
         this.isKinematic = false;
-
-        me.timer.setTimeout(function() {
-            if(!self.removed) {
-                me.game.world.removeChild(self);
-            }
-        // }, 5000);
-        }, 15000 / game.vel.x);
     },
 
     update: function(dt) {
         if(game.alive) {
-            if(game.vel.x <= 3.5) {
-                game.vel.x += 0.0001;
-            } else {
-                game.vel.x = 3.5;
-            }
-            // console.log(this.body.accel);
-            // console.log(game.vel.x);
             this.body.vel.x += -this.body.accel.x * me.timer.tick;
-
             var limit = this.body.ancestor.pos._x + this.body.width;
             var limitX = game.res.width - (this.body.ancestor.pos._x + this.body.width);
 
@@ -61,7 +46,7 @@ var Sidewalk = me.Entity.extend({
                 this.nextFrame = true;
                 me.game.world.addChild(new Sidewalk(limit-this.body.accel.x), this.z);
             }
-            if(limit <= 1) {
+            if(limit <= 10) {
                 this.removed = true;
                 me.game.world.removeChild(this);
             }

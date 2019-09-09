@@ -36,13 +36,6 @@ var EnemyFly = me.Entity.extend({
 
         this.removed = false;
         this.isKinematic = false;
-
-        me.timer.setTimeout(function() {
-            if(!self.removed) {
-                me.game.world.removeChild(self);
-            }
-        // }, 8000);
-        }, 24000 / game.vel.x);
     },
 
     update: function(dt) {
@@ -50,7 +43,7 @@ var EnemyFly = me.Entity.extend({
             this.body.vel.x += -this.body.accel.x * me.timer.tick;
 
             var limit = this.body.ancestor.pos._x + this.body.width;
-            if(limit <= 1) {
+            if(limit <= 10) {
                 this.removed = true;
                 me.game.world.removeChild(this);
             }
