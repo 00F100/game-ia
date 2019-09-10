@@ -33752,32 +33752,15 @@ var game = {
         height: 480
     },
 
+    alive: true,
+
     vel: {
         x: 1,
         y: 0
     },
 
-    // now: {
-    //     x: 0,
-    //     y: 0
-    // },
-
     // game assets
     assets : [
-        // { name: "player", type:"image", src:"data/img/sprite/player.png" },
-        // { name: "enemy", type:"image", src:"data/img/sprite/wheelie_right.png" },
-        // { name: "area01map", type:"image", src:"data/img/map/area01_level_tiles.png" },
-        // { name: "testmap", type:"image", src:"data/img/map/test.png" },
-        // { name: "PressStart2P", type:"image", src: "data/fnt/PressStart2P.png" },
-        // { name: "PressStart2P", type:"binary", src: "data/fnt/PressStart2P.fnt"},
-        // { name: "area01", type:"tmx", src:"data/map/area01.tmx" },
-        // { name: "errou", type: "audio", src: "data/bgm/"},
-        // { name: "olokinho-meu", type: "audio", src: "data/bgm/"},
-        // { name: "porra-meu-ala", type: "audio", src: "data/bgm/"},
-        // { name: "frango", type: "audio", src: "data/bgm/"},
-        // { name: "vai-morre", type: "audio", src: "data/bgm/"},
-        // { name: "eita", type: "audio", src: "data/bgm/"},
-        // { name: "vilma", type: "audio", src: "data/bgm/"},
         { name: "sidewalk", type:"image", src:"data/img/sidewalk.png" },
         { name: "cacti", type:"image", src:"data/img/cacti.png" },
         { name: "plant1", type:"image", src:"data/img/plant1.png" },
@@ -33786,7 +33769,9 @@ var game = {
         { name: "cloud3", type:"image", src:"data/img/cloud3.png" },
         { name: "player", type:"image", src:"data/img/player.png" },
         { name: "enemyCacti", type:"image", src:"data/img/enemyCacti.png" },
-        { name: "enemyFly", type:"image", src:"data/img/enemyFly.png" }
+        { name: "enemyFly", type:"image", src:"data/img/enemyFly.png" },
+        { name: "PressStart2P", type:"image", src: "data/fnt/PressStart2P.png" },
+        { name: "PressStart2P", type:"binary", src: "data/fnt/PressStart2P.fnt"}
     ],
 
     onload: function()
@@ -33802,7 +33787,7 @@ var game = {
     },
 
     loaded: function () {
-        me.state.set(me.state.PLAY, new PlayScreen());
+        me.state.set(me.state.PLAY, new Welcome());
         me.input.bindKey(me.input.KEY.DOWN, "duck");
         me.input.bindKey(me.input.KEY.UP, "jump");
         me.input.bindKey(me.input.KEY.SPACE, "jump");
@@ -33846,28 +33831,25 @@ var Cacti = me.Entity.extend({
 
         this.removed = false;
         this.isKinematic = true;
-
-        me.timer.setTimeout(function() {
-            if(!self.removed) {
-                me.game.world.removeChild(self);
-            }
-        // }, 5000);
-        }, 15000 / game.vel.x);
     },
 
     update: function(dt) {
-        this.body.vel.x += -this.body.accel.x * me.timer.tick;
+        if(game.alive) {
+            this.body.vel.x += -this.body.accel.x * me.timer.tick;
 
-        var limit = this.body.ancestor.pos._x + this.body.width;
-        var limitX = game.res.width - (this.body.ancestor.pos._x + this.body.width);
+            var limit = this.body.ancestor.pos._x + this.body.width;
+            var limitX = game.res.width - (this.body.ancestor.pos._x + this.body.width);
 
-        if(limitX > 0 && !this.nextFrame) {
-            this.nextFrame = true;
-            me.game.world.addChild(new Cacti(limit-this.body.accel.x, this.zi, this.ze), this.z);
-        }
-        if(limit <= 1) {
-            this.removed = true;
-            me.game.world.removeChild(this);
+            if(limitX > 0 && !this.nextFrame) {
+                this.nextFrame = true;
+                me.game.world.addChild(new Cacti(limit-this.body.accel.x, this.zi, this.ze), this.z);
+            }
+            if(limit <= 15) {
+                this.removed = true;
+                me.game.world.removeChild(this);
+            }
+        } else {
+            this.body.setVelocity(0, 0);
         }
 
         this.body.update(dt);
@@ -33917,28 +33899,25 @@ var Cloud = me.Entity.extend({
 
         this.removed = false;
         this.isKinematic = true;
-
-        me.timer.setTimeout(function() {
-            if(!self.removed) {
-                me.game.world.removeChild(self);
-            }
-        // }, 8000);
-        }, 24000 / game.vel.x);
     },
 
     update: function(dt) {
-        this.body.vel.x += -this.body.accel.x * me.timer.tick;
+        if(game.alive) {
+            this.body.vel.x += -this.body.accel.x * me.timer.tick;
 
-        var limit = this.body.ancestor.pos._x + this.body.width;
-        var limitX = game.res.width - (this.body.ancestor.pos._x + this.body.width);
+            var limit = this.body.ancestor.pos._x + this.body.width;
+            var limitX = game.res.width - (this.body.ancestor.pos._x + this.body.width);
 
-        if(limitX > 0 && !this.nextFrame) {
-            this.nextFrame = true;
-            me.game.world.addChild(new Cloud(limit-this.body.accel.x, this.zi, this.ze), this.z);
-        }
-        if(limit <= 1) {
-            this.removed = true;
-            me.game.world.removeChild(this);
+            if(limitX > 0 && !this.nextFrame) {
+                this.nextFrame = true;
+                me.game.world.addChild(new Cloud(limit-this.body.accel.x, this.zi, this.ze), this.z);
+            }
+            if(limit <= 15) {
+                this.removed = true;
+                me.game.world.removeChild(this);
+            }
+        } else {
+            this.body.setVelocity(0, 0);
         }
 
         this.body.update(dt);
@@ -33978,22 +33957,19 @@ var EnemyCacti = me.Entity.extend({
 
         this.removed = false;
         this.isKinematic = false;
-
-        me.timer.setTimeout(function() {
-            if(!self.removed) {
-                me.game.world.removeChild(self);
-            }
-        // }, 8000);
-        }, 24000 / game.vel.x);
     },
 
     update: function(dt) {
-        this.body.vel.x += -this.body.accel.x * me.timer.tick;
+        if(game.alive) {
+            this.body.vel.x += -this.body.accel.x * me.timer.tick;
 
-        var limit = this.body.ancestor.pos._x + this.body.width;
-        if(limit <= 1) {
-            this.removed = true;
-            me.game.world.removeChild(this);
+            var limit = this.body.ancestor.pos._x + this.body.width;
+            if(limit <= 15) {
+                this.removed = true;
+                me.game.world.removeChild(this);
+            }
+        } else {
+            this.body.setVelocity(0, 0);
         }
         this.body.update(dt);
 
@@ -34007,7 +33983,7 @@ var EnemyFly = me.Entity.extend({
         me.Entity.prototype.init.apply(this,
             [
                 630, 
-                340,
+                me.Math.random(1,4)%2 == 0 ? 340 : 410,
                 {
                     width : 75,
                     height : 33.5,
@@ -34036,23 +34012,21 @@ var EnemyFly = me.Entity.extend({
 
         this.removed = false;
         this.isKinematic = false;
-
-        me.timer.setTimeout(function() {
-            if(!self.removed) {
-                me.game.world.removeChild(self);
-            }
-        // }, 8000);
-        }, 24000 / game.vel.x);
     },
 
     update: function(dt) {
-        this.body.vel.x += -this.body.accel.x * me.timer.tick;
+        if(game.alive) {
+            this.body.vel.x += -this.body.accel.x * me.timer.tick;
 
-        var limit = this.body.ancestor.pos._x + this.body.width;
-        if(limit <= 1) {
-            this.removed = true;
-            me.game.world.removeChild(this);
+            var limit = this.body.ancestor.pos._x + this.body.width;
+            if(limit <= 15) {
+                this.removed = true;
+                me.game.world.removeChild(this);
+            }
+        } else {
+            this.body.setVelocity(0, 0);
         }
+
         this.body.update(dt);
 
         return (me.Entity.prototype.update.apply(this, [dt]) || this.body.vel.x !== 0 || this.body.vel.y !== 0);
@@ -34060,7 +34034,8 @@ var EnemyFly = me.Entity.extend({
 });
 var EnemyGenerate = me.Container.extend({
 
-    init: function(limit) {
+    init: function(limit, z) {
+        this.z = z;
         me.Container.prototype.init.apply(this);
         this.isPersistent = true;
         this.floating = true;
@@ -34070,8 +34045,8 @@ var EnemyGenerate = me.Container.extend({
         this.hasEnemy = false;
     },
     update: function() {
-        if(this.interval >= this.limit) {
-            if(me.Math.random(1, 3)%2 == 0) {
+        if(game.alive && this.interval >= this.limit) {
+            if(me.Math.random(1, 4)%2 == 0) {
                 this.interval = 0;
                 this.genEnemy();
             }
@@ -34080,15 +34055,10 @@ var EnemyGenerate = me.Container.extend({
     },
 
     genEnemy: function() {
-        if(me.Math.random(1, 3)%2 == 0) {
-            me.game.world.addChild(new EnemyFly(), 2);
+        if(me.Math.random(1, 4)%2 == 0) {
+            me.game.world.addChild(new EnemyFly(), this.z);
         } else {
-            me.game.world.addChild(new EnemyCacti(), 2);
-            // if(me.Math.random(1, 3)%2 == 0) {
-
-            // } else {
-
-            // }
+            me.game.world.addChild(new EnemyCacti(), this.z);
         }
     }
 });
@@ -34179,15 +34149,6 @@ var HumanPlayer = me.Entity.extend({
         this.entityWidth = 74;
         this.entityHeight = 89;
 
-        // Equação de Torricelli
-        // 
-        // V = velocidade final 
-        // V0 = velocidade inicial 
-        // a = aceleração 
-        // ∆S = variação de espaço
-        //
-        // V² = V0² + 2 * a * D
-
         me.Entity.prototype.init.apply(this,
             [
                 this.startPoint.x, this.startPoint.y,
@@ -34244,6 +34205,15 @@ var HumanPlayer = me.Entity.extend({
     update : function (dt) {
         if(this.alive) {
             var self = this;
+
+            if (game.vel.x < 2) {
+                this.body.gravity.y = 0.17;
+            } else if(game.vel.x < 3) {
+                this.body.gravity.y = 0.22;
+            } else if (game.vel.x < 4) {
+                this.body.gravity.y = 0.28;
+            }
+
             if (me.input.isKeyPressed('jump')) {
                 if (!this.body.jumping && !this.body.falling) {
                     this.runJump();
@@ -34275,6 +34245,7 @@ var HumanPlayer = me.Entity.extend({
                 // this.hud.continue = false;
                 this.body.vel.x = 0;
                 this.body.vel.y = 0;
+                game.alive = false;
                 // game.vel.x = 0;
                 // this.renderable.setCurrentAnimation("die");
                 // me.audio.play("errou");
@@ -34321,28 +34292,25 @@ var Plant = me.Entity.extend({
 
         this.removed = false;
         this.isKinematic = true;
-
-        me.timer.setTimeout(function() {
-            if(!self.removed) {
-                me.game.world.removeChild(self);
-            }
-        // }, 5000);
-        }, 15000 / game.vel.x);
     },
 
     update: function(dt) {
-        this.body.vel.x += -this.body.accel.x * me.timer.tick;
+        if(game.alive) {
+            this.body.vel.x += -this.body.accel.x * me.timer.tick;
 
-        var limit = this.body.ancestor.pos._x + this.body.width;
-        var limitX = game.res.width - (this.body.ancestor.pos._x + this.body.width);
+            var limit = this.body.ancestor.pos._x + this.body.width;
+            var limitX = game.res.width - (this.body.ancestor.pos._x + this.body.width);
 
-        if(limitX > 0 && !this.nextFrame) {
-            this.nextFrame = true;
-            me.game.world.addChild(new Plant(limit-this.body.accel.x, this.zi, this.ze), this.z);
-        }
-        if(limit <= 1) {
-            this.removed = true;
-            me.game.world.removeChild(this);
+            if(limitX > 0 && !this.nextFrame) {
+                this.nextFrame = true;
+                me.game.world.addChild(new Plant(limit-this.body.accel.x, this.zi, this.ze), this.z);
+            }
+            if(limit <= 15) {
+                this.removed = true;
+                me.game.world.removeChild(this);
+            }
+        } else {
+            this.body.setVelocity(0, 0);
         }
 
         this.body.update(dt);
@@ -34350,14 +34318,62 @@ var Plant = me.Entity.extend({
         return (me.Entity.prototype.update.apply(this, [dt]) || this.body.vel.x !== 0 || this.body.vel.y !== 0);
     }
 });
+var ScoreBoard = me.Container.extend({
+    init: function() {
+        me.Container.prototype.init.apply(this);
+        this.addChild(new ScoreItem());
+        this.addChild(new Velocity());
+    }
+});
+
+var ScoreItem = me.Renderable.extend({
+    init: function() {
+        me.Renderable.prototype.init.apply(this, [10, 10, 0, 0]);
+        this.font = new me.BitmapFont(me.loader.getBinary('PressStart2P'), me.loader.getImage('PressStart2P'));
+        this.font.textAlign = "right";
+        this.font.textBaseline = "bottom";
+        this.distance = 0;
+        this.interval = 0;
+    },
+
+    update: function() {
+        if(game.alive) {
+            this.interval++;
+            var A = 3 * game.vel.x;
+            var T = this.interval / 100;
+            this.distance += ((A * T) - this.distance);
+        }
+    },
+    draw: function(renderer) {
+        this.font.draw(renderer, 'Distance: ' + parseInt(this.distance), 600, 100);
+    }
+});
+
+var Velocity = me.Renderable.extend({
+    init: function() {
+        me.Renderable.prototype.init.apply(this, [10, 10, 0, 0]);
+        this.font = new me.BitmapFont(me.loader.getBinary('PressStart2P'), me.loader.getImage('PressStart2P'));
+        this.font.textAlign = "right";
+        this.font.textBaseline = "bottom";
+    },
+    update: function() {
+        if(game.alive) {
+            if(game.vel.x <= 3.5) {
+                game.vel.x += 0.001;
+            } else {
+                game.vel.x = 3.5;
+            }
+        }
+    },
+    draw: function(renderer) {
+        this.font.draw(renderer, 'Velocity: ' + parseInt(3 * game.vel.x), 600, 150);
+    }
+});
 var Sidewalk = me.Entity.extend({
 
-    init: function(x) {
+    init: function(x, z) {
         var self = this;
-
-        if(x == undefined) {
-            x = 0;
-        }
+        this.z = z;
         this.nextFrame = false;
         me.Entity.prototype.init.apply(this,
             [
@@ -34387,36 +34403,26 @@ var Sidewalk = me.Entity.extend({
 
         this.removed = false;
         this.isKinematic = false;
-
-        me.timer.setTimeout(function() {
-            if(!self.removed) {
-                me.game.world.removeChild(self);
-            }
-        // }, 5000);
-        }, 15000 / game.vel.x);
     },
 
     update: function(dt) {
-        if(game.vel.x <= 3.5) {
-            game.vel.x += 0.0001;
+        if(game.alive) {
+            this.body.vel.x += -this.body.accel.x * me.timer.tick;
+            var limit = this.body.ancestor.pos._x + this.body.width;
+            var limitX = game.res.width - (this.body.ancestor.pos._x + this.body.width);
+
+            if(limitX > 0 && !this.nextFrame) {
+                this.nextFrame = true;
+                me.game.world.addChild(new Sidewalk(limit-this.body.accel.x), this.z);
+            }
+            if(limit <= 15) {
+                this.removed = true;
+                me.game.world.removeChild(this);
+            }
         } else {
-            game.vel.x = 3.5;
+            this.body.setVelocity(0, 0);
         }
-        // console.log(game.vel.x);
-        this.body.vel.x += -this.body.accel.x * me.timer.tick;
-
-        var limit = this.body.ancestor.pos._x + this.body.width;
-        var limitX = game.res.width - (this.body.ancestor.pos._x + this.body.width);
-
-        if(limitX > 0 && !this.nextFrame) {
-            this.nextFrame = true;
-            me.game.world.addChild(new Sidewalk(limit-this.body.accel.x));
-        }
-        if(limit <= 1) {
-            this.removed = true;
-            me.game.world.removeChild(this);
-        }
-
+        
         this.body.update(dt);
 
         return (me.Entity.prototype.update.apply(this, [dt]) || this.body.vel.x !== 0 || this.body.vel.y !== 0);
@@ -34433,14 +34439,36 @@ var PlayScreen = me.ScreenObject.extend( {
 
     onResetEvent: function() {
         me.game.world.addChild(new me.ColorLayer("background", "#ffe2b7", 0), 0);
-        me.game.world.addChild(new Cacti(0, 100, 1000, 1), 1);
-        me.game.world.addChild(new Plant(0, 500, 1000, 1), 1);
-        me.game.world.addChild(new Cloud(0, 80, 1000, 1), 1);
-        me.game.world.addChild(new HumanPlayer(), 20);
-        me.game.world.addChild(new Sidewalk(), 60);
-        // me.game.world.addChild(new EnemyCacti(), 2)
-        // me.game.world.addChild(new EnemyFly(), 2)
-        me.game.world.addChild(new EnemyGenerate(90));
+        me.game.world.addChild(new ScoreBoard(), 100);
+        me.game.world.addChild(new Sidewalk(0, 10), 10);
+        me.game.world.addChild(new Cacti(0, 100, 1000, 10), 10);
+        me.game.world.addChild(new Plant(0, 500, 1000, 10), 10);
+        me.game.world.addChild(new Cloud(0, 80, 1000, 10), 10);
+        me.game.world.addChild(new HumanPlayer(), 50);
+        me.game.world.addChild(new EnemyGenerate(75, 60), 60);
+    },
+    
+    
+    onDestroyEvent: function() {
+        me.game.world.removeChild(this.sidewalk);
+        me.game.world.removeChild(this.colorContent);
+    }
+});
+var Welcome = me.ScreenObject.extend( {
+
+    init: function() {
+        me.ScreenObject.prototype.init.apply(this);
+    },
+
+    onResetEvent: function() {
+        me.game.world.addChild(new me.ColorLayer("background", "#ffe2b7", 0), 0);
+        me.game.world.addChild(new ScoreBoard(), 100);
+        me.game.world.addChild(new Sidewalk(0, 10), 10);
+        me.game.world.addChild(new Cacti(0, 100, 1000, 10), 10);
+        me.game.world.addChild(new Plant(0, 500, 1000, 10), 10);
+        me.game.world.addChild(new Cloud(0, 80, 1000, 10), 10);
+        me.game.world.addChild(new HumanPlayer(), 50);
+        me.game.world.addChild(new EnemyGenerate(75, 60), 60);
     },
     
     

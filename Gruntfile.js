@@ -81,19 +81,19 @@ module.exports = function(grunt) {
       },
     },
 
-    // uglify: {
-    //   options: {
-    //     report: 'min',
-    //     preserveComments: 'some'
-    //   },
-    //   dist: {
-    //     files: {
-    //       'build/js/app.min.js': [
-    //         'build/js/app.js'
-    //       ]
-    //     }
-    //   }
-    // },
+    uglify: {
+      options: {
+        report: 'min',
+        preserveComments: 'some'
+      },
+      dist: {
+        files: {
+          'build/js/app.min.js': [
+            'build/js/app.js'
+          ]
+        }
+      }
+    },
 
     connect: {
       server: {

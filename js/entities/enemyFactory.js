@@ -1,11 +1,11 @@
-var EnemyGenerate = me.Container.extend({
+var EnemyFactory = me.Container.extend({
 
     init: function(limit, z) {
         this.z = z;
         this._super(me.Container, 'init');
         this.isPersistent = true;
         this.floating = true;
-        this.name = "EnemyGenerate";
+        this.name = "EnemyFactory";
         this.interval = 0;
         this.limit = limit;
         this.hasEnemy = false;
