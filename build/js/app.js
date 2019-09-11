@@ -33787,11 +33787,12 @@ var game = {
     },
 
     loaded: function () {
-        me.state.set(me.state.PLAY, new Welcome());
+        me.state.set(me.state.WELCOME, new WelcomeScreen());
+        me.state.set(me.state.PLAY, new PlayScreen());
         me.input.bindKey(me.input.KEY.DOWN, "duck");
         me.input.bindKey(me.input.KEY.UP, "jump");
         me.input.bindKey(me.input.KEY.SPACE, "jump");
-        me.state.change(me.state.PLAY);
+        me.state.change(me.state.WELCOME);
     }
 };
 
@@ -33976,6 +33977,36 @@ var EnemyCacti = me.Entity.extend({
         return (me.Entity.prototype.update.apply(this, [dt]) || this.body.vel.x !== 0 || this.body.vel.y !== 0);
     }
 });
+var EnemyFactory = me.Container.extend({
+
+    init: function(limit, z) {
+        this.z = z;
+        me.Container.prototype.init.apply(this);
+        this.isPersistent = true;
+        this.floating = true;
+        this.name = "EnemyFactory";
+        this.interval = 0;
+        this.limit = limit;
+        this.hasEnemy = false;
+    },
+    update: function() {
+        if(game.alive && this.interval >= this.limit) {
+            if(me.Math.random(1, 4)%2 == 0) {
+                this.interval = 0;
+                this.genEnemy();
+            }
+        }
+        this.interval++;
+    },
+
+    genEnemy: function() {
+        if(me.Math.random(1, 4)%2 == 0) {
+            me.game.world.addChild(new EnemyFly(), this.z);
+        } else {
+            me.game.world.addChild(new EnemyCacti(), this.z);
+        }
+    }
+});
 var EnemyFly = me.Entity.extend({
 
     init: function() {
@@ -34030,36 +34061,6 @@ var EnemyFly = me.Entity.extend({
         this.body.update(dt);
 
         return (me.Entity.prototype.update.apply(this, [dt]) || this.body.vel.x !== 0 || this.body.vel.y !== 0);
-    }
-});
-var EnemyGenerate = me.Container.extend({
-
-    init: function(limit, z) {
-        this.z = z;
-        me.Container.prototype.init.apply(this);
-        this.isPersistent = true;
-        this.floating = true;
-        this.name = "EnemyGenerate";
-        this.interval = 0;
-        this.limit = limit;
-        this.hasEnemy = false;
-    },
-    update: function() {
-        if(game.alive && this.interval >= this.limit) {
-            if(me.Math.random(1, 4)%2 == 0) {
-                this.interval = 0;
-                this.genEnemy();
-            }
-        }
-        this.interval++;
-    },
-
-    genEnemy: function() {
-        if(me.Math.random(1, 4)%2 == 0) {
-            me.game.world.addChild(new EnemyFly(), this.z);
-        } else {
-            me.game.world.addChild(new EnemyCacti(), this.z);
-        }
     }
 });
 // var HUD = {};
@@ -34431,6 +34432,36 @@ var Sidewalk = me.Entity.extend({
         return false;
     }
 });
+var Start = me.Renderable.extend({
+
+    init: function(x, zi, ze, z) {
+        me.Renderable.prototype.init.apply(this, [0, 0, 600, 10]);
+
+        this.font = new me.BitmapFont(me.loader.getBinary('PressStart2P'), me.loader.getImage('PressStart2P'));
+        this.font.textAlign = "center";
+        this.font.textBaseline = "bottom";
+
+        this.font2 = new me.BitmapFont(me.loader.getBinary('PressStart2P'), me.loader.getImage('PressStart2P'));
+        this.font2.textAlign = "left";
+        this.font2.textBaseline = "bottom";
+
+        
+    },
+
+    update: function(dt) {
+        if (me.input.isKeyPressed('jump')) {
+            me.state.change(me.state.PLAY);
+        }
+    },
+
+    draw: function(renderer) {
+        this.font.draw(renderer, 'ET BILU', 600, 130);
+        this.font2.draw(renderer, '[X] play alone', 400, 230);
+        this.font2.draw(renderer, '[ ] vs IA', 400, 260);
+        this.font2.draw(renderer, '[ ] see IA', 400, 290);
+        this.font.draw(renderer, 'PRESS SPACE TO START', 600, 380);
+    }
+});
 var PlayScreen = me.ScreenObject.extend( {
 
     init: function() {
@@ -34438,42 +34469,71 @@ var PlayScreen = me.ScreenObject.extend( {
     },
 
     onResetEvent: function() {
-        me.game.world.addChild(new me.ColorLayer("background", "#ffe2b7", 0), 0);
-        me.game.world.addChild(new ScoreBoard(), 100);
-        me.game.world.addChild(new Sidewalk(0, 10), 10);
-        me.game.world.addChild(new Cacti(0, 100, 1000, 10), 10);
-        me.game.world.addChild(new Plant(0, 500, 1000, 10), 10);
-        me.game.world.addChild(new Cloud(0, 80, 1000, 10), 10);
-        me.game.world.addChild(new HumanPlayer(), 50);
-        me.game.world.addChild(new EnemyGenerate(75, 60), 60);
+        
+        this.color = new me.ColorLayer("background", "#ffe2b7", 0);
+        this.scoreBoard = new ScoreBoard();
+        this.sidewalk = new Sidewalk(0, 10);
+        this.cacti = new Cacti(0, 100, 1000, 10);
+        this.plant = new Plant(0, 500, 1000, 10);
+        this.cloud = new Cloud(0, 80, 1000, 10);
+        this.humanPlayer = new HumanPlayer();
+        this.enemyFactory = new EnemyFactory(75, 60);
+
+        me.game.world.addChild(this.color, 0);
+        me.game.world.addChild(this.scoreBoard, 100);
+        me.game.world.addChild(this.sidewalk, 10);
+        me.game.world.addChild(this.cacti, 10);
+        me.game.world.addChild(this.plant, 10);
+        me.game.world.addChild(this.cloud, 10);
+        me.game.world.addChild(this.humanPlayer, 50);
+        me.game.world.addChild(this.enemyFactory, 60);
     },
     
     
     onDestroyEvent: function() {
+        me.game.world.removeChild(this.color);
+        me.game.world.removeChild(this.scoreBoard);
         me.game.world.removeChild(this.sidewalk);
-        me.game.world.removeChild(this.colorContent);
+        me.game.world.removeChild(this.cacti);
+        me.game.world.removeChild(this.plant);
+        me.game.world.removeChild(this.cloud);
+        me.game.world.removeChild(this.humanPlayer);
+        me.game.world.removeChild(this.enemyFactory);
     }
 });
-var Welcome = me.ScreenObject.extend( {
+var WelcomeScreen = me.ScreenObject.extend( {
 
     init: function() {
         me.ScreenObject.prototype.init.apply(this);
     },
 
     onResetEvent: function() {
-        me.game.world.addChild(new me.ColorLayer("background", "#ffe2b7", 0), 0);
-        me.game.world.addChild(new ScoreBoard(), 100);
-        me.game.world.addChild(new Sidewalk(0, 10), 10);
-        me.game.world.addChild(new Cacti(0, 100, 1000, 10), 10);
-        me.game.world.addChild(new Plant(0, 500, 1000, 10), 10);
-        me.game.world.addChild(new Cloud(0, 80, 1000, 10), 10);
-        me.game.world.addChild(new HumanPlayer(), 50);
-        me.game.world.addChild(new EnemyGenerate(75, 60), 60);
+        this.color = new me.ColorLayer("background", "#ffe2b7", 0);
+        this.fade = new me.ColorLayer("background", "#000000", 0);
+        this.fade.setOpacity(0.4);
+        this.sidewalk = new Sidewalk(0, 10);
+        this.cacti = new Cacti(0, 100, 1000, 10);
+        this.plant = new Plant(0, 500, 1000, 10);
+        this.cloud = new Cloud(0, 80, 1000, 10);
+        this.start = new Start();
+
+        me.game.world.addChild(this.color, 0);
+        me.game.world.addChild(this.sidewalk, 10);
+        me.game.world.addChild(this.cacti, 10);
+        me.game.world.addChild(this.plant, 10);
+        me.game.world.addChild(this.cloud, 10);
+        me.game.world.addChild(this.fade, 20);
+        me.game.world.addChild(this.start, 30);
+        
     },
     
-    
     onDestroyEvent: function() {
-        me.game.world.removeChild(this.sidewalk);
-        me.game.world.removeChild(this.colorContent);
+        me.game.world.removeChild(this.color);
+        // me.game.world.removeChild(this.sidewalk);
+        // me.game.world.removeChild(this.cacti);
+        me.game.world.removeChild(this.plant);
+        me.game.world.removeChild(this.cloud);
+        me.game.world.removeChild(this.fade);
+        me.game.world.removeChild(this.start);
     }
 });

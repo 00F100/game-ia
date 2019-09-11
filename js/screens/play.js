@@ -29,10 +29,6 @@ var PlayScreen = me.ScreenObject.extend( {
     onDestroyEvent: function() {
         me.game.world.removeChild(this.color);
         me.game.world.removeChild(this.scoreBoard);
-        me.game.world.removeChild(this.sidewalk);
-        me.game.world.removeChild(this.cacti);
-        me.game.world.removeChild(this.plant);
-        me.game.world.removeChild(this.cloud);
         me.game.world.removeChild(this.humanPlayer);
         me.game.world.removeChild(this.enemyFactory);
     }

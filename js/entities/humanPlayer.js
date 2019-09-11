@@ -42,6 +42,10 @@ var HumanPlayer = me.Entity.extend({
         this.body.collisionType = me.collision.types.PLAYER_OBJECT;
 
         this.isKinematic = false;
+
+        me.input.bindKey(me.input.KEY.DOWN, "duck");
+        me.input.bindKey(me.input.KEY.UP, "jump");
+        me.input.bindKey(me.input.KEY.SPACE, "jump");
     },
 
     runJump: function() {
@@ -108,6 +112,7 @@ var HumanPlayer = me.Entity.extend({
                 this.body.vel.x = 0;
                 this.body.vel.y = 0;
                 game.alive = false;
+                me.state.change(me.state.GAMEOVER);
                 // game.vel.x = 0;
                 // this.renderable.setCurrentAnimation("die");
                 // me.audio.play("errou");

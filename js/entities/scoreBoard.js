@@ -22,6 +22,7 @@ var ScoreItem = me.Renderable.extend({
             var A = 3 * game.vel.x;
             var T = this.interval / 100;
             this.distance += ((A * T) - this.distance);
+            game.human.distance = parseInt(this.distance);
         }
     },
     draw: function(renderer) {
@@ -43,6 +44,7 @@ var Velocity = me.Renderable.extend({
             } else {
                 game.vel.x = 3.5;
             }
+            game.human.velocity = parseInt(3 * game.vel.x);
         }
     },
     draw: function(renderer) {

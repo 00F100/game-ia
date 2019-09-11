@@ -1,4 +1,4 @@
-var Start = me.Renderable.extend({
+var End = me.Renderable.extend({
 
     init: function(x, zi, ze, z) {
         this._super(me.Renderable, "init", [0, 0, 600, 10]);
@@ -14,13 +14,13 @@ var Start = me.Renderable.extend({
         this.selected = 0;
         this.limit = 2;
 
-        me.input.bindKey(me.input.KEY.ENTER, "start", true);
+        me.input.bindKey(me.input.KEY.ENTER, "restart", true);
         me.input.bindKey(me.input.KEY.DOWN, "change-down", true);
         me.input.bindKey(me.input.KEY.UP, "change-up", true);
     },
 
     update: function(dt) {
-        if (me.input.isKeyPressed("start")) {
+        if (me.input.isKeyPressed("restart")) {
             me.state.change(me.state.PLAY);
         } else if (me.input.isKeyPressed("change-down")) {
             this.selected++;
@@ -36,9 +36,9 @@ var Start = me.Renderable.extend({
 
     draw: function(renderer) {
         this.font.draw(renderer, 'ET BILU', 600, 130);
-        this.font2.draw(renderer, '[' + (this.selected == 0 ? 'X' : ' ') +'] play alone', 400, 230);
-        this.font2.draw(renderer, '[' + (this.selected == 1 ? 'X' : ' ') +'] vs IA', 400, 260);
-        this.font2.draw(renderer, '[' + (this.selected == 2 ? 'X' : ' ') +'] see IA', 400, 290);
-        this.font.draw(renderer, 'PRESS ENTER TO START', 600, 380);
+        this.font.draw(renderer, 'GAME OVER', 600, 230);
+        this.font.draw(renderer, 'PRESS ENTER TO RETURN', 600, 330);
+        this.font.draw(renderer, 'Distance: ' + game.human.distance, 600, 400);
+        this.font.draw(renderer, 'Velocity: ' + game.human.velocity, 600, 430);
     }
 });

@@ -7,6 +7,11 @@ var game = {
 
     alive: true,
 
+    human: {
+        distance: 0,
+        velocity: 0
+    },
+
     vel: {
         x: 1,
         y: 0
@@ -42,9 +47,7 @@ var game = {
     loaded: function () {
         me.state.set(me.state.WELCOME, new WelcomeScreen());
         me.state.set(me.state.PLAY, new PlayScreen());
-        me.input.bindKey(me.input.KEY.DOWN, "duck");
-        me.input.bindKey(me.input.KEY.UP, "jump");
-        me.input.bindKey(me.input.KEY.SPACE, "jump");
+        me.state.set(me.state.GAMEOVER, new Gameover());
         me.state.change(me.state.WELCOME);
     }
 };
