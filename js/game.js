@@ -45,9 +45,13 @@ var game = {
     },
 
     loaded: function () {
-        me.state.set(me.state.WELCOME, new WelcomeScreen());
+
+        me.state.NEURALNETWORK = me.state.USER + 1;
+
+        me.state.set(me.state.READY, new WelcomeScreen());
         me.state.set(me.state.PLAY, new PlayScreen());
         me.state.set(me.state.GAMEOVER, new Gameover());
-        me.state.change(me.state.WELCOME);
+        me.state.set(me.state.NEURALNETWORK, new NeuralNetworkScreen());
+        me.state.change(me.state.READY);
     }
 };

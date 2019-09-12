@@ -1,7 +1,7 @@
-var PlayScreen = me.ScreenObject.extend( {
+var PlayScreen = me.Stage.extend( {
 
     init: function() {
-        this._super(me.ScreenObject, 'init');
+        this._super(me.Stage, 'init');
     },
 
     onResetEvent: function() {

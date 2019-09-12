@@ -1,7 +1,7 @@
-var WelcomeScreen = me.ScreenObject.extend( {
+var WelcomeScreen = me.Stage.extend( {
 
     init: function() {
-        this._super(me.ScreenObject, 'init');
+        this._super(me.Stage, 'init');
     },
 
     onResetEvent: function() {

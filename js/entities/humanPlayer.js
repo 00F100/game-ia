@@ -112,6 +112,7 @@ var HumanPlayer = me.Entity.extend({
                 this.body.vel.x = 0;
                 this.body.vel.y = 0;
                 game.alive = false;
+                game.vel.x = 1;
                 me.state.change(me.state.GAMEOVER);
                 // game.vel.x = 0;
                 // this.renderable.setCurrentAnimation("die");

@@ -21,7 +21,18 @@ var Start = me.Renderable.extend({
 
     update: function(dt) {
         if (me.input.isKeyPressed("start")) {
-            me.state.change(me.state.PLAY);
+            // me.state.change(me.state.PLAY);
+            switch(this.selected) {
+                case 0:
+                    me.state.change(me.state.PLAY);
+                    break;
+                case 1:
+                    break;
+
+                case 2:
+                    me.state.change(me.state.NEURALNETWORK);
+                    break;
+            }
         } else if (me.input.isKeyPressed("change-down")) {
             this.selected++;
         } else if (me.input.isKeyPressed("change-up")) {

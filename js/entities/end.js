@@ -21,16 +21,7 @@ var End = me.Renderable.extend({
 
     update: function(dt) {
         if (me.input.isKeyPressed("restart")) {
-            me.state.change(me.state.PLAY);
-        } else if (me.input.isKeyPressed("change-down")) {
-            this.selected++;
-        } else if (me.input.isKeyPressed("change-up")) {
-            this.selected--;
-        }
-        if(this.selected > this.limit) {
-            this.selected = 0;
-        } else if(this.selected < 0) {
-            this.selected = this.limit;
+            me.state.change(me.state.WELCOME);
         }
     },
 

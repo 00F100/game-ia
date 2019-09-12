@@ -33754,6 +33754,11 @@ var game = {
 
     alive: true,
 
+    human: {
+        distance: 0,
+        velocity: 0
+    },
+
     vel: {
         x: 1,
         y: 0
@@ -33789,9 +33794,7 @@ var game = {
     loaded: function () {
         me.state.set(me.state.WELCOME, new WelcomeScreen());
         me.state.set(me.state.PLAY, new PlayScreen());
-        me.input.bindKey(me.input.KEY.DOWN, "duck");
-        me.input.bindKey(me.input.KEY.UP, "jump");
-        me.input.bindKey(me.input.KEY.SPACE, "jump");
+        me.state.set(me.state.GAMEOVER, new Gameover());
         me.state.change(me.state.WELCOME);
     }
 };
@@ -33924,6 +33927,50 @@ var Cloud = me.Entity.extend({
         this.body.update(dt);
 
         return (me.Entity.prototype.update.apply(this, [dt]) || this.body.vel.x !== 0 || this.body.vel.y !== 0);
+    }
+});
+var End = me.Renderable.extend({
+
+    init: function(x, zi, ze, z) {
+        me.Renderable.prototype.init.apply(this, [0, 0, 600, 10]);
+
+        this.font = new me.BitmapFont(me.loader.getBinary('PressStart2P'), me.loader.getImage('PressStart2P'));
+        this.font.textAlign = "center";
+        this.font.textBaseline = "bottom";
+
+        this.font2 = new me.BitmapFont(me.loader.getBinary('PressStart2P'), me.loader.getImage('PressStart2P'));
+        this.font2.textAlign = "left";
+        this.font2.textBaseline = "bottom";
+
+        this.selected = 0;
+        this.limit = 2;
+
+        me.input.bindKey(me.input.KEY.ENTER, "restart", true);
+        me.input.bindKey(me.input.KEY.DOWN, "change-down", true);
+        me.input.bindKey(me.input.KEY.UP, "change-up", true);
+    },
+
+    update: function(dt) {
+        if (me.input.isKeyPressed("restart")) {
+            me.state.change(me.state.PLAY);
+        } else if (me.input.isKeyPressed("change-down")) {
+            this.selected++;
+        } else if (me.input.isKeyPressed("change-up")) {
+            this.selected--;
+        }
+        if(this.selected > this.limit) {
+            this.selected = 0;
+        } else if(this.selected < 0) {
+            this.selected = this.limit;
+        }
+    },
+
+    draw: function(renderer) {
+        this.font.draw(renderer, 'ET BILU', 600, 130);
+        this.font.draw(renderer, 'GAME OVER', 600, 230);
+        this.font.draw(renderer, 'PRESS ENTER TO RETURN', 600, 330);
+        this.font.draw(renderer, 'Distance: ' + game.human.distance, 600, 400);
+        this.font.draw(renderer, 'Velocity: ' + game.human.velocity, 600, 430);
     }
 });
 var EnemyCacti = me.Entity.extend({
@@ -34181,6 +34228,10 @@ var HumanPlayer = me.Entity.extend({
         this.body.collisionType = me.collision.types.PLAYER_OBJECT;
 
         this.isKinematic = false;
+
+        me.input.bindKey(me.input.KEY.DOWN, "duck");
+        me.input.bindKey(me.input.KEY.UP, "jump");
+        me.input.bindKey(me.input.KEY.SPACE, "jump");
     },
 
     runJump: function() {
@@ -34247,6 +34298,8 @@ var HumanPlayer = me.Entity.extend({
                 this.body.vel.x = 0;
                 this.body.vel.y = 0;
                 game.alive = false;
+                game.vel.x = 1;
+                me.state.change(me.state.GAMEOVER);
                 // game.vel.x = 0;
                 // this.renderable.setCurrentAnimation("die");
                 // me.audio.play("errou");
@@ -34343,6 +34396,7 @@ var ScoreItem = me.Renderable.extend({
             var A = 3 * game.vel.x;
             var T = this.interval / 100;
             this.distance += ((A * T) - this.distance);
+            game.human.distance = parseInt(this.distance);
         }
     },
     draw: function(renderer) {
@@ -34364,6 +34418,7 @@ var Velocity = me.Renderable.extend({
             } else {
                 game.vel.x = 3.5;
             }
+            game.human.velocity = parseInt(3 * game.vel.x);
         }
     },
     draw: function(renderer) {
@@ -34445,21 +34500,69 @@ var Start = me.Renderable.extend({
         this.font2.textAlign = "left";
         this.font2.textBaseline = "bottom";
 
-        
+        this.selected = 0;
+        this.limit = 2;
+
+        me.input.bindKey(me.input.KEY.ENTER, "start", true);
+        me.input.bindKey(me.input.KEY.DOWN, "change-down", true);
+        me.input.bindKey(me.input.KEY.UP, "change-up", true);
     },
 
     update: function(dt) {
-        if (me.input.isKeyPressed('jump')) {
+        if (me.input.isKeyPressed("start")) {
             me.state.change(me.state.PLAY);
+        } else if (me.input.isKeyPressed("change-down")) {
+            this.selected++;
+        } else if (me.input.isKeyPressed("change-up")) {
+            this.selected--;
+        }
+        if(this.selected > this.limit) {
+            this.selected = 0;
+        } else if(this.selected < 0) {
+            this.selected = this.limit;
         }
     },
 
     draw: function(renderer) {
         this.font.draw(renderer, 'ET BILU', 600, 130);
-        this.font2.draw(renderer, '[X] play alone', 400, 230);
-        this.font2.draw(renderer, '[ ] vs IA', 400, 260);
-        this.font2.draw(renderer, '[ ] see IA', 400, 290);
-        this.font.draw(renderer, 'PRESS SPACE TO START', 600, 380);
+        this.font2.draw(renderer, '[' + (this.selected == 0 ? 'X' : ' ') +'] play alone', 400, 230);
+        this.font2.draw(renderer, '[' + (this.selected == 1 ? 'X' : ' ') +'] vs IA', 400, 260);
+        this.font2.draw(renderer, '[' + (this.selected == 2 ? 'X' : ' ') +'] see IA', 400, 290);
+        this.font.draw(renderer, 'PRESS ENTER TO START', 600, 380);
+    }
+});
+var Gameover = me.ScreenObject.extend( {
+
+    init: function() {
+        me.ScreenObject.prototype.init.apply(this);
+    },
+
+    onResetEvent: function() {
+        this.color = new me.ColorLayer("background", "#ffe2b7", 0);
+        this.fade = new me.ColorLayer("background", "#000000", 0);
+        this.fade.setOpacity(0.4);
+        this.sidewalk = new Sidewalk(0, 10);
+        this.cacti = new Cacti(0, 100, 1000, 10);
+        this.plant = new Plant(0, 500, 1000, 10);
+        this.cloud = new Cloud(0, 80, 1000, 10);
+        this.end = new End();
+        
+        game.alive = true;
+        game.vel.x = 1;
+
+        me.game.world.addChild(this.color, 0);
+        me.game.world.addChild(this.sidewalk, 10);
+        me.game.world.addChild(this.cacti, 10);
+        me.game.world.addChild(this.plant, 10);
+        me.game.world.addChild(this.cloud, 10);
+        me.game.world.addChild(this.fade, 20);
+        me.game.world.addChild(this.end, 30);
+        
+    },
+    
+    onDestroyEvent: function() {
+        me.game.world.removeChild(this.color);
+        me.game.world.removeChild(this.fade);
     }
 });
 var PlayScreen = me.ScreenObject.extend( {
@@ -34493,10 +34596,6 @@ var PlayScreen = me.ScreenObject.extend( {
     onDestroyEvent: function() {
         me.game.world.removeChild(this.color);
         me.game.world.removeChild(this.scoreBoard);
-        me.game.world.removeChild(this.sidewalk);
-        me.game.world.removeChild(this.cacti);
-        me.game.world.removeChild(this.plant);
-        me.game.world.removeChild(this.cloud);
         me.game.world.removeChild(this.humanPlayer);
         me.game.world.removeChild(this.enemyFactory);
     }
@@ -34528,12 +34627,12 @@ var WelcomeScreen = me.ScreenObject.extend( {
     },
     
     onDestroyEvent: function() {
-        me.game.world.removeChild(this.color);
+        // me.game.world.removeChild(this.color);
         // me.game.world.removeChild(this.sidewalk);
         // me.game.world.removeChild(this.cacti);
-        me.game.world.removeChild(this.plant);
-        me.game.world.removeChild(this.cloud);
-        me.game.world.removeChild(this.fade);
-        me.game.world.removeChild(this.start);
+        // me.game.world.removeChild(this.plant);
+        // me.game.world.removeChild(this.cloud);
+        // me.game.world.removeChild(this.fade);
+        // me.game.world.removeChild(this.start);
     }
 });
