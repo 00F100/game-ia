@@ -18,6 +18,7 @@ var NeuralNetworkScreen = me.Stage.extend( {
         this.cloud = new Cloud(0, 80, 1000, 10);
         // this.humanPlayer = new HumanPlayer();
         this.enemyFactory = new EnemyFactory(75, 60);
+        this.neuralFactory = new NeuralFactory();
 
         me.game.world.addChild(this.color, 0);
         me.game.world.addChild(this.scoreBoard, 100);
@@ -27,6 +28,7 @@ var NeuralNetworkScreen = me.Stage.extend( {
         me.game.world.addChild(this.cloud, 10);
         // me.game.world.addChild(this.humanPlayer, 50);
         me.game.world.addChild(this.enemyFactory, 60);
+        me.game.world.addChild(this.neuralFactory, 60);
     },
     
     

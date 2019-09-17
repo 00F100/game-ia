@@ -1,9 +1,14 @@
 var HumanPlayer = me.Entity.extend({
-    init : function () {
+    init : function (x = 30, y = 300, callbackColision) {
+
+        this.distance = 0;
+
+        this.callback = [];
+        this.callback['colision'] = callbackColision;
 
         this.startPoint = {
-            x: 30,
-            y: 300
+            x: x,
+            y: y
         };
 
         this.entityWidth = 74;
@@ -69,6 +74,10 @@ var HumanPlayer = me.Entity.extend({
     },
 
     update : function (dt) {
+        var limit = this.body.ancestor.pos._x + this.body.width;
+        if(limit <= 15) {
+            me.game.world.removeChild(this);
+        }
         if(this.alive) {
             var self = this;
 
@@ -107,16 +116,7 @@ var HumanPlayer = me.Entity.extend({
                 return false;
                 break;
             case me.collision.types.ENEMY_OBJECT:
-                this.alive = false;
-                // this.hud.continue = false;
-                this.body.vel.x = 0;
-                this.body.vel.y = 0;
-                game.alive = false;
-                game.vel.x = 1;
-                me.state.change(me.state.GAMEOVER);
-                // game.vel.x = 0;
-                // this.renderable.setCurrentAnimation("die");
-                // me.audio.play("errou");
+                this.callback['colision'](this);
                 break;
         }
         return true;

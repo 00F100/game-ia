@@ -27,6 +27,9 @@ var ScoreItem = me.Renderable.extend({
     },
     draw: function(renderer) {
         this.font.draw(renderer, 'Distance: ' + parseInt(this.distance), 600, 100);
+        if(game.ia.generation > 0) {
+            this.font.draw(renderer, 'Generation: ' + parseInt(game.ia.generation), 600, 200);
+        }
     }
 });
 

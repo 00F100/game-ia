@@ -12,6 +12,10 @@ var game = {
         velocity: 0
     },
 
+    ia: {
+        generation: 0
+    },
+
     vel: {
         x: 1,
         y: 0

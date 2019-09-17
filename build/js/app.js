@@ -33792,10 +33792,14 @@ var game = {
     },
 
     loaded: function () {
-        me.state.set(me.state.WELCOME, new WelcomeScreen());
+
+        me.state.NEURALNETWORK = me.state.USER + 1;
+
+        me.state.set(me.state.READY, new WelcomeScreen());
         me.state.set(me.state.PLAY, new PlayScreen());
         me.state.set(me.state.GAMEOVER, new Gameover());
-        me.state.change(me.state.WELCOME);
+        me.state.set(me.state.NEURALNETWORK, new NeuralNetworkScreen());
+        me.state.change(me.state.READY);
     }
 };
 
@@ -33952,16 +33956,7 @@ var End = me.Renderable.extend({
 
     update: function(dt) {
         if (me.input.isKeyPressed("restart")) {
-            me.state.change(me.state.PLAY);
-        } else if (me.input.isKeyPressed("change-down")) {
-            this.selected++;
-        } else if (me.input.isKeyPressed("change-up")) {
-            this.selected--;
-        }
-        if(this.selected > this.limit) {
-            this.selected = 0;
-        } else if(this.selected < 0) {
-            this.selected = this.limit;
+            me.state.change(me.state.WELCOME);
         }
     },
 
@@ -34510,7 +34505,18 @@ var Start = me.Renderable.extend({
 
     update: function(dt) {
         if (me.input.isKeyPressed("start")) {
-            me.state.change(me.state.PLAY);
+            // me.state.change(me.state.PLAY);
+            switch(this.selected) {
+                case 0:
+                    me.state.change(me.state.PLAY);
+                    break;
+                case 1:
+                    break;
+
+                case 2:
+                    me.state.change(me.state.NEURALNETWORK);
+                    break;
+            }
         } else if (me.input.isKeyPressed("change-down")) {
             this.selected++;
         } else if (me.input.isKeyPressed("change-up")) {
@@ -34531,10 +34537,17 @@ var Start = me.Renderable.extend({
         this.font.draw(renderer, 'PRESS ENTER TO START', 600, 380);
     }
 });
-var Gameover = me.ScreenObject.extend( {
+var NeuralNetwork = {
+    exec: function(input, hiddenColumn, hiddenRow, outputColumn, outputData) {
+        console.log('neural network');
+        console.log([input, hiddenColumn, hiddenRow, outputColumn, outputData]);
+        outputData([1, 2, 3, 4, 5]);
+    }
+};
+var Gameover = me.Stage.extend( {
 
     init: function() {
-        me.ScreenObject.prototype.init.apply(this);
+        me.Stage.prototype.init.apply(this);
     },
 
     onResetEvent: function() {
@@ -34565,10 +34578,49 @@ var Gameover = me.ScreenObject.extend( {
         me.game.world.removeChild(this.fade);
     }
 });
-var PlayScreen = me.ScreenObject.extend( {
+var NeuralNetworkScreen = me.Stage.extend( {
 
     init: function() {
-        me.ScreenObject.prototype.init.apply(this);
+        me.Stage.prototype.init.apply(this);
+    },
+
+    onResetEvent: function() {
+        // NeuralNetwork.exec([], 2, 8, 5, function(output) {
+        //     console.log('lambda');
+        //     console.log(output);
+        // });
+
+        this.color = new me.ColorLayer("background", "#ffe2b7", 0);
+        this.scoreBoard = new ScoreBoard();
+        this.sidewalk = new Sidewalk(0, 10);
+        this.cacti = new Cacti(0, 100, 1000, 10);
+        this.plant = new Plant(0, 500, 1000, 10);
+        this.cloud = new Cloud(0, 80, 1000, 10);
+        // this.humanPlayer = new HumanPlayer();
+        this.enemyFactory = new EnemyFactory(75, 60);
+
+        me.game.world.addChild(this.color, 0);
+        me.game.world.addChild(this.scoreBoard, 100);
+        me.game.world.addChild(this.sidewalk, 10);
+        me.game.world.addChild(this.cacti, 10);
+        me.game.world.addChild(this.plant, 10);
+        me.game.world.addChild(this.cloud, 10);
+        // me.game.world.addChild(this.humanPlayer, 50);
+        me.game.world.addChild(this.enemyFactory, 60);
+    },
+    
+    
+    onDestroyEvent: function() {
+        me.game.world.removeChild(this.color);
+        me.game.world.removeChild(this.scoreBoard);
+        me.game.world.removeChild(this.humanPlayer);
+        me.game.world.removeChild(this.enemyFactory);
+    }
+});
+var PlayScreen = me.Stage.extend( {
+
+    init: function() {
+        me.Stage.prototype.init.apply(this);
     },
 
     onResetEvent: function() {
@@ -34600,10 +34652,10 @@ var PlayScreen = me.ScreenObject.extend( {
         me.game.world.removeChild(this.enemyFactory);
     }
 });
-var WelcomeScreen = me.ScreenObject.extend( {
+var WelcomeScreen = me.Stage.extend( {
 
     init: function() {
-        me.ScreenObject.prototype.init.apply(this);
+        me.Stage.prototype.init.apply(this);
     },
 
     onResetEvent: function() {
