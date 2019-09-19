@@ -37,7 +37,8 @@ var Sidewalk = me.Entity.extend({
     },
 
     update: function(dt) {
-        if(game.alive) {
+        this.body.setVelocity(3 * game.vel.x,0);
+        if(game.alive || game.ia.alive) {
             this.body.vel.x += -this.body.accel.x * me.timer.tick;
             var limit = this.body.ancestor.pos._x + this.body.width;
             var limitX = game.res.width - (this.body.ancestor.pos._x + this.body.width);

@@ -33759,6 +33759,10 @@ var game = {
         velocity: 0
     },
 
+    ia: {
+        generation: 0
+    },
+
     vel: {
         x: 1,
         y: 0
@@ -34182,11 +34186,16 @@ var EnemyFly = me.Entity.extend({
 // //     }
 // // });
 var HumanPlayer = me.Entity.extend({
-    init : function () {
+    init : function (x = 30, y = 300, callbackColision) {
+
+        this.distance = 0;
+
+        this.callback = [];
+        this.callback['colision'] = callbackColision;
 
         this.startPoint = {
-            x: 30,
-            y: 300
+            x: x,
+            y: y
         };
 
         this.entityWidth = 74;
@@ -34250,6 +34259,10 @@ var HumanPlayer = me.Entity.extend({
     },
 
     update : function (dt) {
+        var limit = this.body.ancestor.pos._x + this.body.width;
+        if(limit <= 15) {
+            me.game.world.removeChild(this);
+        }
         if(this.alive) {
             var self = this;
 
@@ -34288,19 +34301,47 @@ var HumanPlayer = me.Entity.extend({
                 return false;
                 break;
             case me.collision.types.ENEMY_OBJECT:
-                this.alive = false;
-                // this.hud.continue = false;
-                this.body.vel.x = 0;
-                this.body.vel.y = 0;
-                game.alive = false;
-                game.vel.x = 1;
-                me.state.change(me.state.GAMEOVER);
-                // game.vel.x = 0;
-                // this.renderable.setCurrentAnimation("die");
-                // me.audio.play("errou");
+                this.callback['colision'](this);
                 break;
         }
         return true;
+    }
+});
+var NeuralFactory = me.Container.extend({
+
+    init: function() {
+        this.runner = false;
+        game.ia.generation = 1;
+        this.limit = 20;
+        me.Container.prototype.init.apply(this);
+    },
+
+    update: function(dt) {
+        var self = this;
+        if(!this.runner) {
+            this.down = [];
+            this.runner = true;
+            for(var i = 0; i < this.limit; i++) {
+                var human = new HumanPlayer(me.Math.random(5, 150), 300, function(context) {
+                    if(context.alive) {
+                        context.alive = false;
+                        context.body.vel.x = 0;
+                        context.body.vel.y = 0;
+                        context.distance = game.human.distance;
+                        self.popDown(context);
+                    }
+                });
+                me.game.world.addChild(human, 50);
+            }
+        }
+    },
+
+    popDown: function(context) {
+        this.down.push(context);
+        if(this.down.length == this.limit) {
+            game.ia.generation++;
+            this.runner = false;
+        }
     }
 });
 var Plant = me.Entity.extend({
@@ -34396,6 +34437,9 @@ var ScoreItem = me.Renderable.extend({
     },
     draw: function(renderer) {
         this.font.draw(renderer, 'Distance: ' + parseInt(this.distance), 600, 100);
+        if(game.ia.generation > 0) {
+            this.font.draw(renderer, 'Generation: ' + parseInt(game.ia.generation), 600, 200);
+        }
     }
 });
 
@@ -34598,6 +34642,7 @@ var NeuralNetworkScreen = me.Stage.extend( {
         this.cloud = new Cloud(0, 80, 1000, 10);
         // this.humanPlayer = new HumanPlayer();
         this.enemyFactory = new EnemyFactory(75, 60);
+        this.neuralFactory = new NeuralFactory();
 
         me.game.world.addChild(this.color, 0);
         me.game.world.addChild(this.scoreBoard, 100);
@@ -34607,6 +34652,7 @@ var NeuralNetworkScreen = me.Stage.extend( {
         me.game.world.addChild(this.cloud, 10);
         // me.game.world.addChild(this.humanPlayer, 50);
         me.game.world.addChild(this.enemyFactory, 60);
+        me.game.world.addChild(this.neuralFactory, 60);
     },
     
     
@@ -34631,7 +34677,14 @@ var PlayScreen = me.Stage.extend( {
         this.cacti = new Cacti(0, 100, 1000, 10);
         this.plant = new Plant(0, 500, 1000, 10);
         this.cloud = new Cloud(0, 80, 1000, 10);
-        this.humanPlayer = new HumanPlayer();
+        this.humanPlayer = new HumanPlayer(30, 300, function(context) {
+            context.alive = false;
+            context.body.vel.x = 0;
+            context.body.vel.y = 0;
+            game.alive = false;
+            game.vel.x = 1;
+            me.state.change(me.state.GAMEOVER);
+        });
         this.enemyFactory = new EnemyFactory(75, 60);
 
         me.game.world.addChild(this.color, 0);

@@ -17,12 +17,18 @@ var ScoreItem = me.Renderable.extend({
     },
 
     update: function() {
-        if(game.alive) {
+        if(game.alive || (game.ia.alive && !game.ia.reset)) {
             this.interval++;
             var A = 3 * game.vel.x;
             var T = this.interval / 100;
             this.distance += ((A * T) - this.distance);
             game.human.distance = parseInt(this.distance);
+        } else {
+            if(game.ia.alive) {
+                game.ia.reset = false;
+            }
+            this.interval = 0;
+            this.distance = 0;
         }
     },
     draw: function(renderer) {
@@ -41,7 +47,7 @@ var Velocity = me.Renderable.extend({
         this.font.textBaseline = "bottom";
     },
     update: function() {
-        if(game.alive) {
+        if(game.alive || game.ia.alive) {
             if(game.vel.x <= 3.5) {
                 game.vel.x += 0.001;
             } else {

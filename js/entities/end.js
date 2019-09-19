@@ -15,13 +15,11 @@ var End = me.Renderable.extend({
         this.limit = 2;
 
         me.input.bindKey(me.input.KEY.ENTER, "restart", true);
-        me.input.bindKey(me.input.KEY.DOWN, "change-down", true);
-        me.input.bindKey(me.input.KEY.UP, "change-up", true);
     },
 
     update: function(dt) {
         if (me.input.isKeyPressed("restart")) {
-            me.state.change(me.state.WELCOME);
+            me.state.change(me.state.READY);
         }
     },
 

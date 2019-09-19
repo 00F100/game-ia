@@ -53,26 +53,6 @@ var HumanPlayer = me.Entity.extend({
         me.input.bindKey(me.input.KEY.SPACE, "jump");
     },
 
-    runJump: function() {
-        this.renderable.setCurrentAnimation("jump");
-        this.body.vel.y = -this.body.maxVel.y * me.timer.tick;
-        this.body.jumping = true;
-    },
-
-    runDuck: function() {
-        this.body.shapes[0].points[0].y = 20;
-        this.body.shapes[0].points[1].y = 20;
-        this.body.pos.y = 20;
-        this.renderable.setCurrentAnimation("duck");
-    },
-
-    runWalk: function() {
-        this.body.pos.y = 0;
-        this.body.shapes[0].points[0].y = 0;
-        this.body.shapes[0].points[1].y = 0;
-        this.renderable.setCurrentAnimation("walk");
-    },
-
     update : function (dt) {
         var limit = this.body.ancestor.pos._x + this.body.width;
         if(limit <= 15) {
@@ -120,5 +100,26 @@ var HumanPlayer = me.Entity.extend({
                 break;
         }
         return true;
+    },
+
+
+    runJump: function() {
+        this.renderable.setCurrentAnimation("jump");
+        this.body.vel.y = -this.body.maxVel.y * me.timer.tick;
+        this.body.jumping = true;
+    },
+
+    runDuck: function() {
+        this.body.shapes[0].points[0].y = 20;
+        this.body.shapes[0].points[1].y = 20;
+        this.body.pos.y = 20;
+        this.renderable.setCurrentAnimation("duck");
+    },
+
+    runWalk: function() {
+        this.body.pos.y = 0;
+        this.body.shapes[0].points[0].y = 0;
+        this.body.shapes[0].points[1].y = 0;
+        this.renderable.setCurrentAnimation("walk");
     }
 });

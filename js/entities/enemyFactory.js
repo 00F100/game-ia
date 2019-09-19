@@ -11,7 +11,7 @@ var EnemyFactory = me.Container.extend({
         this.hasEnemy = false;
     },
     update: function() {
-        if(game.alive && this.interval >= this.limit) {
+        if((game.alive || game.ia.alive) && this.interval >= this.limit) {
             if(me.Math.random(1, 4)%2 == 0) {
                 this.interval = 0;
                 this.genEnemy();

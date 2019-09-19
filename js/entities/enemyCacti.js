@@ -35,7 +35,7 @@ var EnemyCacti = me.Entity.extend({
     },
 
     update: function(dt) {
-        if(game.alive) {
+        if(game.alive || game.ia.alive) {
             this.body.vel.x += -this.body.accel.x * me.timer.tick;
 
             var limit = this.body.ancestor.pos._x + this.body.width;
