@@ -43,8 +43,8 @@ var game = {
 
     onload: function()
     {
-        if (!me.video.init(game.res.width, game.res.height, {wrapper : "screen", scale : "auto"})) {
-        // if (!me.video.init(game.res.width, game.res.height, {wrapper : "screen"})) {
+        // if (!me.video.init(game.res.width, game.res.height, {wrapper : "screen", scale : "auto"})) {
+        if (!me.video.init(game.res.width, game.res.height, {wrapper : "screen"})) {
             alert("Your browser does not support HTML5 canvas.");
             return;
         }

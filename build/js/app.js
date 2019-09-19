@@ -33754,6 +33754,11 @@ var game = {
 
     alive: true,
 
+    ia: {
+        alive: false,
+        reset: false
+    },
+
     human: {
         distance: 0,
         velocity: 0
@@ -33846,7 +33851,7 @@ var Cacti = me.Entity.extend({
     },
 
     update: function(dt) {
-        if(game.alive) {
+        if(game.alive || game.ia.alive) {
             this.body.vel.x += -this.body.accel.x * me.timer.tick;
 
             var limit = this.body.ancestor.pos._x + this.body.width;
@@ -33914,7 +33919,7 @@ var Cloud = me.Entity.extend({
     },
 
     update: function(dt) {
-        if(game.alive) {
+        if(game.alive || game.ia.alive) {
             this.body.vel.x += -this.body.accel.x * me.timer.tick;
 
             var limit = this.body.ancestor.pos._x + this.body.width;
@@ -33954,13 +33959,11 @@ var End = me.Renderable.extend({
         this.limit = 2;
 
         me.input.bindKey(me.input.KEY.ENTER, "restart", true);
-        me.input.bindKey(me.input.KEY.DOWN, "change-down", true);
-        me.input.bindKey(me.input.KEY.UP, "change-up", true);
     },
 
     update: function(dt) {
         if (me.input.isKeyPressed("restart")) {
-            me.state.change(me.state.WELCOME);
+            me.state.change(me.state.READY);
         }
     },
 
@@ -34007,7 +34010,7 @@ var EnemyCacti = me.Entity.extend({
     },
 
     update: function(dt) {
-        if(game.alive) {
+        if(game.alive || game.ia.alive) {
             this.body.vel.x += -this.body.accel.x * me.timer.tick;
 
             var limit = this.body.ancestor.pos._x + this.body.width;
@@ -34036,7 +34039,7 @@ var EnemyFactory = me.Container.extend({
         this.hasEnemy = false;
     },
     update: function() {
-        if(game.alive && this.interval >= this.limit) {
+        if((game.alive || game.ia.alive) && this.interval >= this.limit) {
             if(me.Math.random(1, 4)%2 == 0) {
                 this.interval = 0;
                 this.genEnemy();
@@ -34092,7 +34095,7 @@ var EnemyFly = me.Entity.extend({
     },
 
     update: function(dt) {
-        if(game.alive) {
+        if(game.alive || game.ia.alive) {
             this.body.vel.x += -this.body.accel.x * me.timer.tick;
 
             var limit = this.body.ancestor.pos._x + this.body.width;
@@ -34238,26 +34241,6 @@ var HumanPlayer = me.Entity.extend({
         me.input.bindKey(me.input.KEY.SPACE, "jump");
     },
 
-    runJump: function() {
-        this.renderable.setCurrentAnimation("jump");
-        this.body.vel.y = -this.body.maxVel.y * me.timer.tick;
-        this.body.jumping = true;
-    },
-
-    runDuck: function() {
-        this.body.shapes[0].points[0].y = 20;
-        this.body.shapes[0].points[1].y = 20;
-        this.body.pos.y = 20;
-        this.renderable.setCurrentAnimation("duck");
-    },
-
-    runWalk: function() {
-        this.body.pos.y = 0;
-        this.body.shapes[0].points[0].y = 0;
-        this.body.shapes[0].points[1].y = 0;
-        this.renderable.setCurrentAnimation("walk");
-    },
-
     update : function (dt) {
         var limit = this.body.ancestor.pos._x + this.body.width;
         if(limit <= 15) {
@@ -34305,6 +34288,27 @@ var HumanPlayer = me.Entity.extend({
                 break;
         }
         return true;
+    },
+
+
+    runJump: function() {
+        this.renderable.setCurrentAnimation("jump");
+        this.body.vel.y = -this.body.maxVel.y * me.timer.tick;
+        this.body.jumping = true;
+    },
+
+    runDuck: function() {
+        this.body.shapes[0].points[0].y = 20;
+        this.body.shapes[0].points[1].y = 20;
+        this.body.pos.y = 20;
+        this.renderable.setCurrentAnimation("duck");
+    },
+
+    runWalk: function() {
+        this.body.pos.y = 0;
+        this.body.shapes[0].points[0].y = 0;
+        this.body.shapes[0].points[1].y = 0;
+        this.renderable.setCurrentAnimation("walk");
     }
 });
 var NeuralFactory = me.Container.extend({
@@ -34313,6 +34317,8 @@ var NeuralFactory = me.Container.extend({
         this.runner = false;
         game.ia.generation = 1;
         this.limit = 20;
+        game.alive = false;
+        game.ia.alive = true;
         me.Container.prototype.init.apply(this);
     },
 
@@ -34321,6 +34327,7 @@ var NeuralFactory = me.Container.extend({
         if(!this.runner) {
             this.down = [];
             this.runner = true;
+            game.ia.alive = true;
             for(var i = 0; i < this.limit; i++) {
                 var human = new HumanPlayer(me.Math.random(5, 150), 300, function(context) {
                     if(context.alive) {
@@ -34340,6 +34347,8 @@ var NeuralFactory = me.Container.extend({
         this.down.push(context);
         if(this.down.length == this.limit) {
             game.ia.generation++;
+            game.vel.x = 1;
+            game.ia.reset = true;
             this.runner = false;
         }
     }
@@ -34385,7 +34394,7 @@ var Plant = me.Entity.extend({
     },
 
     update: function(dt) {
-        if(game.alive) {
+        if(game.alive || game.ia.alive) {
             this.body.vel.x += -this.body.accel.x * me.timer.tick;
 
             var limit = this.body.ancestor.pos._x + this.body.width;
@@ -34427,12 +34436,18 @@ var ScoreItem = me.Renderable.extend({
     },
 
     update: function() {
-        if(game.alive) {
+        if(game.alive || (game.ia.alive && !game.ia.reset)) {
             this.interval++;
             var A = 3 * game.vel.x;
             var T = this.interval / 100;
             this.distance += ((A * T) - this.distance);
             game.human.distance = parseInt(this.distance);
+        } else {
+            if(game.ia.alive) {
+                game.ia.reset = false;
+            }
+            this.interval = 0;
+            this.distance = 0;
         }
     },
     draw: function(renderer) {
@@ -34451,7 +34466,7 @@ var Velocity = me.Renderable.extend({
         this.font.textBaseline = "bottom";
     },
     update: function() {
-        if(game.alive) {
+        if(game.alive || game.ia.alive) {
             if(game.vel.x <= 3.5) {
                 game.vel.x += 0.001;
             } else {
@@ -34501,7 +34516,8 @@ var Sidewalk = me.Entity.extend({
     },
 
     update: function(dt) {
-        if(game.alive) {
+        this.body.setVelocity(3 * game.vel.x,0);
+        if(game.alive || game.ia.alive) {
             this.body.vel.x += -this.body.accel.x * me.timer.tick;
             var limit = this.body.ancestor.pos._x + this.body.width;
             var limitX = game.res.width - (this.body.ancestor.pos._x + this.body.width);
@@ -34637,9 +34653,9 @@ var NeuralNetworkScreen = me.Stage.extend( {
         this.color = new me.ColorLayer("background", "#ffe2b7", 0);
         this.scoreBoard = new ScoreBoard();
         this.sidewalk = new Sidewalk(0, 10);
-        this.cacti = new Cacti(0, 100, 1000, 10);
-        this.plant = new Plant(0, 500, 1000, 10);
-        this.cloud = new Cloud(0, 80, 1000, 10);
+        // this.cacti = new Cacti(0, 100, 1000, 10);
+        // this.plant = new Plant(0, 500, 1000, 10);
+        // this.cloud = new Cloud(0, 80, 1000, 10);
         // this.humanPlayer = new HumanPlayer();
         this.enemyFactory = new EnemyFactory(75, 60);
         this.neuralFactory = new NeuralFactory();
@@ -34647,9 +34663,9 @@ var NeuralNetworkScreen = me.Stage.extend( {
         me.game.world.addChild(this.color, 0);
         me.game.world.addChild(this.scoreBoard, 100);
         me.game.world.addChild(this.sidewalk, 10);
-        me.game.world.addChild(this.cacti, 10);
-        me.game.world.addChild(this.plant, 10);
-        me.game.world.addChild(this.cloud, 10);
+        // me.game.world.addChild(this.cacti, 10);
+        // me.game.world.addChild(this.plant, 10);
+        // me.game.world.addChild(this.cloud, 10);
         // me.game.world.addChild(this.humanPlayer, 50);
         me.game.world.addChild(this.enemyFactory, 60);
         me.game.world.addChild(this.neuralFactory, 60);
