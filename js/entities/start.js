@@ -48,8 +48,8 @@ var Start = me.Renderable.extend({
     draw: function(renderer) {
         this.font.draw(renderer, 'ET BILU', 600, 130);
         this.font2.draw(renderer, '[' + (this.selected == 0 ? 'X' : ' ') +'] play alone', 400, 230);
-        this.font2.draw(renderer, '[' + (this.selected == 1 ? 'X' : ' ') +'] vs IA', 400, 260);
-        this.font2.draw(renderer, '[' + (this.selected == 2 ? 'X' : ' ') +'] see IA', 400, 290);
+        this.font2.draw(renderer, '[' + (this.selected == 1 ? 'X' : ' ') +'] vs AI', 400, 260);
+        this.font2.draw(renderer, '[' + (this.selected == 2 ? 'X' : ' ') +'] see AI', 400, 290);
         this.font.draw(renderer, 'PRESS ENTER TO START', 600, 380);
     }
 });
