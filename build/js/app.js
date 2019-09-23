@@ -34202,6 +34202,8 @@ var HumanPlayer = me.Entity.extend({
 
         this.distance = 0;
 
+        this.weightSeq = null;
+
         this.callback = [];
         this.callback['colision'] = callbackColision;
         this.callback['update'] = callbackUpdate;
@@ -34329,7 +34331,7 @@ var NeuralFactory = me.Container.extend({
     init: function() {
         this.runner = false;
         game.ia.generation = 1;
-        this.limit = 10;
+        this.limit = 40;
         game.alive = false;
         game.ia.alive = true;
         me.Container.prototype.init.apply(this);
@@ -34366,50 +34368,21 @@ var NeuralFactory = me.Container.extend({
                             }
                         }
 
-                        // distance
-                        // distancia ate proximo obstaculo
-
-                        // height
-                        // altura objtaculo
-
-                        // width
-                        // comprimento obstaculo
-
-                        // 4 * game.vel.x
-                        // velocidade
-
-                        // context.body.gravity.y
-                        // gravidade
-
-                        var neural = NeuralNetwork.exec([], [
+                        var neural = NeuralNetwork.exec(context, [], [
                             distance,
                             width,
                             height,
                             (4 * game.vel.x), 
                             context.body.gravity.y
                         ], 2, 8, 3, function(output) {
-                            if(output[0] > 0) {
+                            if(output[0] == 1) {
                                 if (!context.body.jumping && !context.body.falling) {
                                     context.runJump();
                                 }
-                            } else if(output[1] > 0) {
+                            } else if(output[2] == 1) {
                                 context.runDuck();
                             }
                         });
-
-
-
-                        // rede neural
-
-                        // pular
-                        // abaixar
-                        // não fazer nada
-
-                        // if (!context.body.jumping && !context.body.falling) {
-                            // context.runJump();
-                        // }
-                        
-                        // context.runDuck();
                     }
                 });
                 me.game.world.addChild(human, 50);
@@ -34672,10 +34645,52 @@ var Start = me.Renderable.extend({
     }
 });
 var NeuralNetwork = {
-    exec: function(matrix = [], input, hiddenColumn, hiddenRow, outputColumn, outputData) {
-        console.log('neural network');
-        // console.log([input, hiddenColumn, hiddenRow, outputColumn, outputData]);
-        // outputData([1, 2, 3, 4, 5]);
+    
+    exec: function(context, matrix = [], input, hiddenColumn, hiddenRow, outputColumns, outputData) {
+        var totalWeight = ((input.length * hiddenColumn) + (hiddenColumn * hiddenRow) + (hiddenRow * outputColumns));
+        if(matrix.length == 0 || matrix.length != totalWeight) {
+            if(context.weightSeq == null || context.weightSeq != totalWeight) {
+                context.weightSeq = matrix = this.genMatrix(totalWeight);
+            } else {
+                matrix = context.weightSeq;
+            }
+        }
+        var index = 0;
+        var indexNeurons = 0;
+        var neurons = [];
+        var output = [];
+        for(var column = 0; column < hiddenColumn; column++) {
+            if(column == 0) {
+                for(var row in input) {
+                    var totalData = input[row] * matrix[index];
+                    neurons[index] = (totalData < 1 ? 0 : totalData);
+                    index++;
+                }
+            } else if (column == (hiddenColumn - 1)) {
+                for (var c = 0; c < outputColumns; c++) {
+                    totalData = neurons[indexNeurons] * matrix[index];
+                    output.push(totalData > 0 ? 1 : 0);
+                    indexNeurons++;
+                    index++;
+                }
+            } else {
+                for(var row = 0; row < hiddenRow; row++) {
+                    totalData = neurons[indexNeurons] * matrix[index];
+                    neurons[index] = (totalData < 1 ? 0 : totalData);
+                    indexNeurons++;
+                    index++;
+                }
+            }
+        }
+        outputData(output);
+    },
+
+    genMatrix: function(totalWeight) {
+        var items = [];
+        for(var i = 0; i < totalWeight; i++) {
+            items.push(me.Math.random(0, 1000) * (me.Math.random(1,4) == 1 ? -1 : 1));
+        }
+        return items;
     }
 };
 var Gameover = me.Stage.extend( {
