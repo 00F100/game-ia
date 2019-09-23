@@ -36,16 +36,19 @@ var EnemyFly = me.Entity.extend({
 
         this.removed = false;
         this.isKinematic = false;
+
+        game.enemies.push(this.body);
+        this.enemyId = game.enemies.lenght-1;
     },
 
     update: function(dt) {
         if(game.alive || game.ia.alive) {
-            this.body.vel.x += -this.body.accel.x * me.timer.tick;
-
+            this.body.vel.x += -this.body.accel.x * me.timer.tick;    
             var limit = this.body.ancestor.pos._x + this.body.width;
             if(limit <= 15) {
                 this.removed = true;
                 me.game.world.removeChild(this);
+                game.enemies.splice(this.enemyId, 1);
             }
         } else {
             this.body.setVelocity(0, 0);

@@ -33759,6 +33759,8 @@ var game = {
         reset: false
     },
 
+    enemies: [],
+
     human: {
         distance: 0,
         velocity: 0
@@ -33790,8 +33792,8 @@ var game = {
 
     onload: function()
     {
-        if (!me.video.init(game.res.width, game.res.height, {wrapper : "screen", scale : "auto"})) {
-        // if (!me.video.init(game.res.width, game.res.height, {wrapper : "screen"})) {
+        // if (!me.video.init(game.res.width, game.res.height, {wrapper : "screen", scale : "auto"})) {
+        if (!me.video.init(game.res.width, game.res.height, {wrapper : "screen"})) {
             alert("Your browser does not support HTML5 canvas.");
             return;
         }
@@ -34007,6 +34009,9 @@ var EnemyCacti = me.Entity.extend({
 
         this.removed = false;
         this.isKinematic = false;
+        
+        game.enemies.push(this.body);
+        this.enemyId = game.enemies.lenght-1;
     },
 
     update: function(dt) {
@@ -34017,6 +34022,7 @@ var EnemyCacti = me.Entity.extend({
             if(limit <= 15) {
                 this.removed = true;
                 me.game.world.removeChild(this);
+                game.enemies.splice(this.enemyId, 1);
             }
         } else {
             this.body.setVelocity(0, 0);
@@ -34092,16 +34098,19 @@ var EnemyFly = me.Entity.extend({
 
         this.removed = false;
         this.isKinematic = false;
+
+        game.enemies.push(this.body);
+        this.enemyId = game.enemies.lenght-1;
     },
 
     update: function(dt) {
         if(game.alive || game.ia.alive) {
-            this.body.vel.x += -this.body.accel.x * me.timer.tick;
-
+            this.body.vel.x += -this.body.accel.x * me.timer.tick;    
             var limit = this.body.ancestor.pos._x + this.body.width;
             if(limit <= 15) {
                 this.removed = true;
                 me.game.world.removeChild(this);
+                game.enemies.splice(this.enemyId, 1);
             }
         } else {
             this.body.setVelocity(0, 0);
@@ -34189,12 +34198,13 @@ var EnemyFly = me.Entity.extend({
 // //     }
 // // });
 var HumanPlayer = me.Entity.extend({
-    init : function (x = 30, y = 300, callbackColision) {
+    init : function (x = 30, y = 300, callbackColision, callbackUpdate) {
 
         this.distance = 0;
 
         this.callback = [];
         this.callback['colision'] = callbackColision;
+        this.callback['update'] = callbackUpdate;
 
         this.startPoint = {
             x: x,
@@ -34264,9 +34274,12 @@ var HumanPlayer = me.Entity.extend({
             } else if (me.input.isKeyPressed('duck')) {
                 this.runDuck();
             } else {
-                if(!this.renderable.isCurrentAnimation("walk") && !this.body.jumping && !this.body.falling) {
+                if(!this.renderable.isCurrentAnimation('walk') && !this.body.jumping && !this.body.falling) {
                     this.runWalk();
                 }
+            }
+            if(typeof this.callback['update'] == 'function') {
+                this.callback['update'](this);
             }
         }
 
@@ -34316,7 +34329,7 @@ var NeuralFactory = me.Container.extend({
     init: function() {
         this.runner = false;
         game.ia.generation = 1;
-        this.limit = 20;
+        this.limit = 10;
         game.alive = false;
         game.ia.alive = true;
         me.Container.prototype.init.apply(this);
@@ -34337,6 +34350,67 @@ var NeuralFactory = me.Container.extend({
                         context.distance = game.human.distance;
                         self.popDown(context);
                     }
+                }, function(context) {
+                    if(context.alive) {
+                        var width = 0;
+                        var height = 0;
+                        var distance = 0;
+                        var ID = context.body.ancestor.GUID;
+                        var posHuman = context.body.ancestor.pos._x;
+                        for(var i in game.enemies) {
+                            distance = game.enemies[i].ancestor.pos._x - posHuman;
+                            if(distance > 0) {
+                                width = game.enemies[i].width;
+                                height = game.enemies[i].height;
+                                break;
+                            }
+                        }
+
+                        // distance
+                        // distancia ate proximo obstaculo
+
+                        // height
+                        // altura objtaculo
+
+                        // width
+                        // comprimento obstaculo
+
+                        // 4 * game.vel.x
+                        // velocidade
+
+                        // context.body.gravity.y
+                        // gravidade
+
+                        var neural = NeuralNetwork.exec([], [
+                            distance,
+                            width,
+                            height,
+                            (4 * game.vel.x), 
+                            context.body.gravity.y
+                        ], 2, 8, 3, function(output) {
+                            if(output[0] > 0) {
+                                if (!context.body.jumping && !context.body.falling) {
+                                    context.runJump();
+                                }
+                            } else if(output[1] > 0) {
+                                context.runDuck();
+                            }
+                        });
+
+
+
+                        // rede neural
+
+                        // pular
+                        // abaixar
+                        // não fazer nada
+
+                        // if (!context.body.jumping && !context.body.falling) {
+                            // context.runJump();
+                        // }
+                        
+                        // context.runDuck();
+                    }
                 });
                 me.game.world.addChild(human, 50);
             }
@@ -34347,8 +34421,8 @@ var NeuralFactory = me.Container.extend({
         this.down.push(context);
         if(this.down.length == this.limit) {
             game.ia.generation++;
-            game.vel.x = 1;
-            game.ia.reset = true;
+            // game.vel.x = 1;
+            // game.ia.reset = true;
             this.runner = false;
         }
     }
@@ -34592,16 +34666,16 @@ var Start = me.Renderable.extend({
     draw: function(renderer) {
         this.font.draw(renderer, 'ET BILU', 600, 130);
         this.font2.draw(renderer, '[' + (this.selected == 0 ? 'X' : ' ') +'] play alone', 400, 230);
-        this.font2.draw(renderer, '[' + (this.selected == 1 ? 'X' : ' ') +'] vs IA', 400, 260);
-        this.font2.draw(renderer, '[' + (this.selected == 2 ? 'X' : ' ') +'] see IA', 400, 290);
+        this.font2.draw(renderer, '[' + (this.selected == 1 ? 'X' : ' ') +'] vs AI', 400, 260);
+        this.font2.draw(renderer, '[' + (this.selected == 2 ? 'X' : ' ') +'] see AI', 400, 290);
         this.font.draw(renderer, 'PRESS ENTER TO START', 600, 380);
     }
 });
 var NeuralNetwork = {
-    exec: function(input, hiddenColumn, hiddenRow, outputColumn, outputData) {
+    exec: function(matrix = [], input, hiddenColumn, hiddenRow, outputColumn, outputData) {
         console.log('neural network');
-        console.log([input, hiddenColumn, hiddenRow, outputColumn, outputData]);
-        outputData([1, 2, 3, 4, 5]);
+        // console.log([input, hiddenColumn, hiddenRow, outputColumn, outputData]);
+        // outputData([1, 2, 3, 4, 5]);
     }
 };
 var Gameover = me.Stage.extend( {

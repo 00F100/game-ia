@@ -12,6 +12,8 @@ var game = {
         reset: false
     },
 
+    enemies: [],
+
     human: {
         distance: 0,
         velocity: 0

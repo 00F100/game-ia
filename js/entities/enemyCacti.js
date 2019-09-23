@@ -32,6 +32,9 @@ var EnemyCacti = me.Entity.extend({
 
         this.removed = false;
         this.isKinematic = false;
+        
+        game.enemies.push(this.body);
+        this.enemyId = game.enemies.lenght-1;
     },
 
     update: function(dt) {
@@ -42,6 +45,7 @@ var EnemyCacti = me.Entity.extend({
             if(limit <= 15) {
                 this.removed = true;
                 me.game.world.removeChild(this);
+                game.enemies.splice(this.enemyId, 1);
             }
         } else {
             this.body.setVelocity(0, 0);

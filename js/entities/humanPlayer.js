@@ -1,10 +1,13 @@
 var HumanPlayer = me.Entity.extend({
-    init : function (x = 30, y = 300, callbackColision) {
+    init : function (x = 30, y = 300, callbackColision, callbackUpdate) {
 
         this.distance = 0;
 
+        this.weightSeq = null;
+
         this.callback = [];
         this.callback['colision'] = callbackColision;
+        this.callback['update'] = callbackUpdate;
 
         this.startPoint = {
             x: x,
@@ -76,9 +79,12 @@ var HumanPlayer = me.Entity.extend({
             } else if (me.input.isKeyPressed('duck')) {
                 this.runDuck();
             } else {
-                if(!this.renderable.isCurrentAnimation("walk") && !this.body.jumping && !this.body.falling) {
+                if(!this.renderable.isCurrentAnimation('walk') && !this.body.jumping && !this.body.falling) {
                     this.runWalk();
                 }
+            }
+            if(typeof this.callback['update'] == 'function') {
+                this.callback['update'](this);
             }
         }
 
