@@ -3,7 +3,7 @@ var NeuralFactory = me.Container.extend({
     init: function() {
         this.runner = false;
         game.ia.generation = 1;
-        this.limit = 50;
+        this.limit = 25;
         game.alive = false;
         game.ia.alive = true;
         this._super(me.Container, 'init');
