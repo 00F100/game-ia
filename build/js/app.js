@@ -34331,7 +34331,7 @@ var NeuralFactory = me.Container.extend({
     init: function() {
         this.runner = false;
         game.ia.generation = 1;
-        this.limit = 40;
+        this.limit = 25;
         game.alive = false;
         game.ia.alive = true;
         me.Container.prototype.init.apply(this);
@@ -34662,24 +34662,30 @@ var NeuralNetwork = {
         for(var column = 0; column < hiddenColumn; column++) {
             if(column == 0) {
                 for(var row in input) {
-                    var totalData = input[row] * matrix[index];
-                    neurons[index] = (totalData < 1 ? 0 : totalData);
-                    index++;
+                    for(var rowInternal = 0; rowInternal < hiddenRow; rowInternal++) {
+                        var totalData = input[row] * matrix[index];
+                        neurons[index] = (totalData < 1 ? 0 : totalData);
+                        index++;
+                    }
                 }
             } else if (column == (hiddenColumn - 1)) {
-                for (var c = 0; c < outputColumns; c++) {
-                    totalData = neurons[indexNeurons] * matrix[index];
-                    output.push(totalData > 0 ? 1 : 0);
-                    indexNeurons++;
-                    index++;
+                for(var rowInternal = 0; rowInternal < hiddenRow; rowInternal++) {
+                    for (var c = 0; c < outputColumns; c++) {
+                        totalData = neurons[indexNeurons] * matrix[index];
+                        output.push(totalData > 0 ? 1 : 0);
+                        indexNeurons++;
+                        index++;
+                    }
                 }
             } else {
                 for(var row = 0; row < hiddenRow; row++) {
-                    totalData = neurons[indexNeurons] * matrix[index];
-                    neurons[index] = (totalData < 1 ? 0 : totalData);
-                    indexNeurons++;
-                    index++;
-                }
+                    for(var rowInternal = 0; rowInternal < hiddenRow; rowInternal++) {
+                        totalData = neurons[indexNeurons] * matrix[index];
+                        neurons[index] = (totalData < 1 ? 0 : totalData);
+                        indexNeurons++;
+                        index++;
+                    }
+                }    
             }
         }
         outputData(output);
