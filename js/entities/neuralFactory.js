@@ -46,12 +46,12 @@ var NeuralFactory = me.Container.extend({
                             height,
                             (4 * game.vel.x), 
                             context.body.gravity.y
-                        ], 2, 8, 3, function(output) {
-                            if(output[0] == 1) {
+                        ], 2, 2 , 3, function(output) {
+                            if(output[0] == 1 && output[1] == 0 && output[2] == 0) {
                                 if (!context.body.jumping && !context.body.falling) {
                                     context.runJump();
                                 }
-                            } else if(output[2] == 1) {
+                            } else if(output[0] == 0 && output[1] == 1 && output[2] == 0) {
                                 context.runDuck();
                             }
                         });
