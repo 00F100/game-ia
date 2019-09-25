@@ -1,19 +1,14 @@
 var NeuralFactory = me.Container.extend({
 
-    init: function() {
-        this.runner = false;
-        game.ia.generation = 1;
+    init: function(send = true) {
+        var self = this;
+        this.send = send;
         this.limit = 25;
         game.alive = false;
         game.ia.alive = true;
         this._super(me.Container, 'init');
-    },
-
-    update: function(dt) {
-        var self = this;
-        if(!this.runner) {
-            this.down = [];
-            this.runner = true;
+        this.humans = [];
+        this.down = [];
             game.ia.alive = true;
             for(var i = 0; i < this.limit; i++) {
                 var human = new HumanPlayer(me.Math.random(5, 150), 300, function(context) {
@@ -46,7 +41,7 @@ var NeuralFactory = me.Container.extend({
                             height,
                             (4 * game.vel.x), 
                             context.body.gravity.y
-                        ], 2, 2 , 3, function(output) {
+                        ], 3, 4, 3, function(output) {
                             if(output[0] == 1 && output[1] == 0 && output[2] == 0) {
                                 if (!context.body.jumping && !context.body.falling) {
                                     context.runJump();
@@ -57,18 +52,34 @@ var NeuralFactory = me.Container.extend({
                         });
                     }
                 });
+                this.humans.push(human);
                 me.game.world.addChild(human, 50);
             }
+    },
+
+    update: function(dt) {
+        var total = [];
+        for(var i in this.humans) {
+            var human = this.humans[i];
+            total[i] = human.distance + '.' + i;
         }
+        total.sort(function(a, b){return b-a});
+        var current = total[0].split('.');
+        this.winner = current[1];
     },
 
     popDown: function(context) {
         this.down.push(context);
         if(this.down.length == this.limit) {
+            console.log(this.humans[this.winner].weightSeq);
             game.ia.generation++;
-            // game.vel.x = 1;
-            // game.ia.reset = true;
-            this.runner = false;
+            game.enemies = [];
+            game.vel.x = 1;
+            if(this.send) {
+                me.state.change(me.state.NEURALNETWORK2);
+            } else {
+                me.state.change(me.state.NEURALNETWORK);
+            }
         }
     }
 });

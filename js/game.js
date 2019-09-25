@@ -9,7 +9,7 @@ var game = {
 
     ia: {
         alive: false,
-        reset: false
+        // humans: []
     },
 
     enemies: [],
@@ -20,7 +20,7 @@ var game = {
     },
 
     ia: {
-        generation: 0
+        generation: 1
     },
 
     vel: {
@@ -62,7 +62,8 @@ var game = {
         me.state.set(me.state.READY, new WelcomeScreen());
         me.state.set(me.state.PLAY, new PlayScreen());
         me.state.set(me.state.GAMEOVER, new Gameover());
-        me.state.set(me.state.NEURALNETWORK, new NeuralNetworkScreen());
+        me.state.set(me.state.NEURALNETWORK, new NeuralNetworkScreen(true));
+        me.state.set(me.state.NEURALNETWORK2, new NeuralNetworkScreen(false));
         me.state.change(me.state.READY);
     }
 };

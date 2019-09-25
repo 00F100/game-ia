@@ -34,7 +34,6 @@ var EnemyFly = me.Entity.extend({
 
         this.body.collisionType = me.collision.types.ENEMY_OBJECT
 
-        this.removed = false;
         this.isKinematic = false;
 
         game.enemies.push(this.body);
@@ -46,7 +45,6 @@ var EnemyFly = me.Entity.extend({
             this.body.vel.x += -this.body.accel.x * me.timer.tick;    
             var limit = this.body.ancestor.pos._x + this.body.width;
             if(limit <= 15) {
-                this.removed = true;
                 me.game.world.removeChild(this);
                 game.enemies.splice(this.enemyId, 1);
             }

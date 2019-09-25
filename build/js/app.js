@@ -34374,12 +34374,12 @@ var NeuralFactory = me.Container.extend({
                             height,
                             (4 * game.vel.x), 
                             context.body.gravity.y
-                        ], 2, 8, 3, function(output) {
-                            if(output[0] == 1) {
+                        ], 2, 2 , 3, function(output) {
+                            if(output[0] == 1 && output[1] == 0 && output[2] == 0) {
                                 if (!context.body.jumping && !context.body.falling) {
                                     context.runJump();
                                 }
-                            } else if(output[2] == 1) {
+                            } else if(output[0] == 0 && output[1] == 1 && output[2] == 0) {
                                 context.runDuck();
                             }
                         });
@@ -34647,7 +34647,11 @@ var Start = me.Renderable.extend({
 var NeuralNetwork = {
     
     exec: function(context, matrix = [], input, hiddenColumn, hiddenRow, outputColumns, outputData) {
-        var totalWeight = ((input.length * hiddenColumn) + (hiddenColumn * hiddenRow) + (hiddenRow * outputColumns));
+        var value = 0;
+        for(var i = 0; i < hiddenColumn; i++) {
+            value = value + (hiddenRow * outputColumns);
+        }
+        var totalWeight = (input.length * hiddenColumn) + value + (hiddenRow * outputColumns);
         if(matrix.length == 0 || matrix.length != totalWeight) {
             if(context.weightSeq == null || context.weightSeq != totalWeight) {
                 context.weightSeq = matrix = this.genMatrix(totalWeight);
@@ -34656,36 +34660,69 @@ var NeuralNetwork = {
             }
         }
         var index = 0;
-        var indexNeurons = 0;
         var neurons = [];
         var output = [];
         for(var column = 0; column < hiddenColumn; column++) {
             if(column == 0) {
                 for(var row in input) {
+                    var neuroCount = 0;
                     for(var rowInternal = 0; rowInternal < hiddenRow; rowInternal++) {
-                        var totalData = input[row] * matrix[index];
-                        neurons[index] = (totalData < 1 ? 0 : totalData);
+                        neurons[neuroCount] = (input[row] * matrix[index]) + (neurons[neuroCount] != undefined ? neurons[neuroCount] : 0);
+                        neuroCount++;
                         index++;
                     }
                 }
-            } else if (column == (hiddenColumn - 1)) {
+                neuroCount = 0;
                 for(var rowInternal = 0; rowInternal < hiddenRow; rowInternal++) {
-                    for (var c = 0; c < outputColumns; c++) {
-                        totalData = neurons[indexNeurons] * matrix[index];
-                        output.push(totalData > 0 ? 1 : 0);
+                    if(neurons[neuroCount] <= 0) {
+                        neurons[neuroCount] = 0;
+                    }
+                    neuroCount++;
+                }
+            } else if (column == (hiddenColumn-1)) {
+                var neuroCountBefore = neurons.length;
+                for (var c = 0; c < outputColumns; c++) {
+                    var totalValue = 0;
+                    var columnCalc = (column - 1);
+                    var indexNeurons = ((columnCalc < 1 ? 0 : columnCalc) * hiddenRow);
+                    var neuroCount = neuroCountBefore;
+                    for(var rowInternal = 0; rowInternal < hiddenRow; rowInternal++) {
+                        neurons[neuroCount] = neurons[indexNeurons] * matrix[index];
+                        totalValue = totalValue + neurons[indexNeurons] * matrix[index];
                         indexNeurons++;
+                        neuroCount++;
                         index++;
                     }
+                    output.push(totalValue <= 0 ? 0 : 1);
+                }
+                neuroCount = neuroCountBefore;
+                for(var rowInternal = 0; rowInternal < hiddenRow; rowInternal++) {
+                    if(neurons[neuroCount] <= 0) {
+                        neurons[neuroCount] = 0;
+                    }
+                    neuroCount++;
                 }
             } else {
+                var neuroCountBefore = neurons.length;
                 for(var row = 0; row < hiddenRow; row++) {
+                    var columnCalc = (column - 1);
+                    var indexNeurons = ((columnCalc < 1 ? 0 : columnCalc) * hiddenRow);
+                    var neuroCount = neuroCountBefore;
                     for(var rowInternal = 0; rowInternal < hiddenRow; rowInternal++) {
-                        totalData = neurons[indexNeurons] * matrix[index];
-                        neurons[index] = (totalData < 1 ? 0 : totalData);
+                        var totalData = neurons[indexNeurons] * matrix[index];
+                        neurons[neuroCount] = (neurons[indexNeurons] * matrix[index]) + (neurons[neuroCount] != undefined ? neurons[neuroCount] : 0);
                         indexNeurons++;
+                        neuroCount++;
                         index++;
                     }
-                }    
+                }
+                neuroCount = neuroCountBefore;
+                for(var rowInternal = 0; rowInternal < hiddenRow; rowInternal++) {
+                    if(neurons[neuroCount] <= 0) {
+                        neurons[neuroCount] = 0;
+                    }
+                    neuroCount++;
+                }
             }
         }
         outputData(output);

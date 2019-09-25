@@ -2,10 +2,10 @@ var NeuralNetwork = {
     
     exec: function(context, matrix = [], input, hiddenColumn, hiddenRow, outputColumns, outputData) {
         var value = 0;
-        for(var i = 0; i < hiddenColumn; i++) {
-            value = value + (hiddenRow * outputColumns);
+        for(var i = 0; i < (hiddenColumn-2); i++) {
+            value = value + (hiddenRow * hiddenRow);
         }
-        var totalWeight = (input.length * hiddenColumn) + value + (hiddenRow * outputColumns);
+        var totalWeight = (input.length * hiddenRow) + value + (hiddenRow * outputColumns);
         if(matrix.length == 0 || matrix.length != totalWeight) {
             if(context.weightSeq == null || context.weightSeq != totalWeight) {
                 context.weightSeq = matrix = this.genMatrix(totalWeight);
@@ -34,13 +34,13 @@ var NeuralNetwork = {
                     neuroCount++;
                 }
             } else if (column == (hiddenColumn-1)) {
+                var columnCalc = (column - 1);
                 var neuroCountBefore = neurons.length;
-                for (var c = 0; c < outputColumns; c++) {
+                for(var c = 0; c < hiddenRow; c++) {
                     var totalValue = 0;
-                    var columnCalc = (column - 1);
                     var indexNeurons = ((columnCalc < 1 ? 0 : columnCalc) * hiddenRow);
                     var neuroCount = neuroCountBefore;
-                    for(var rowInternal = 0; rowInternal < hiddenRow; rowInternal++) {
+                    for (var rowInternal = 0; rowInternal < outputColumns; rowInternal++) {
                         neurons[neuroCount] = neurons[indexNeurons] * matrix[index];
                         totalValue = totalValue + neurons[indexNeurons] * matrix[index];
                         indexNeurons++;
@@ -79,14 +79,13 @@ var NeuralNetwork = {
                 }
             }
         }
-        console.log(index);
         outputData(output);
     },
 
     genMatrix: function(totalWeight) {
         var items = [];
         for(var i = 0; i < totalWeight; i++) {
-            items.push(me.Math.random(0, 1000) * (me.Math.random(1,4) == 1 ? -1 : 1));
+            items.push(me.Math.random(1, 1000) * (me.Math.random(1,4) == 1 ? -1 : 1));
         }
         return items;
     }
