@@ -18,7 +18,7 @@ var NeuralNetworkScreen = me.Stage.extend( {
         // this.plant = new Plant(0, 500, 1000, 10);
         // this.cloud = new Cloud(0, 80, 1000, 10);
         // this.humanPlayer = new HumanPlayer();
-        this.enemyFactory = new EnemyFactory(75, 60);
+        this.enemyFactory = new EnemyFactory(me.Math.random(75, 150), 60);
         this.neuralFactory = new NeuralFactory(this.send);
 
         me.game.world.addChild(this.color, 0);

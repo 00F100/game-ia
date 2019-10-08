@@ -1,17 +1,24 @@
 var NeuralNetwork = {
     
     exec: function(context, matrix = [], input, hiddenColumn, hiddenRow, outputColumns, outputData) {
+        if(matrix == null) {
+            matrix = [];
+        }
+        // console.log(matrix);
         var value = 0;
         for(var i = 0; i < (hiddenColumn-2); i++) {
             value = value + (hiddenRow * hiddenRow);
         }
         var totalWeight = (input.length * hiddenRow) + value + (hiddenRow * outputColumns);
         if(matrix.length == 0 || matrix.length != totalWeight) {
-            if(context.weightSeq == null || context.weightSeq != totalWeight) {
-                context.weightSeq = matrix = this.genMatrix(totalWeight);
+            if(context.weightSeq == null) {
+                context.weightSeq = this.genMatrix(totalWeight);
+                matrix = context.weightSeq;
             } else {
                 matrix = context.weightSeq;
             }
+        } else {
+            context.weightSeq = matrix;
         }
         var index = 0;
         var neurons = [];
@@ -85,7 +92,7 @@ var NeuralNetwork = {
     genMatrix: function(totalWeight) {
         var items = [];
         for(var i = 0; i < totalWeight; i++) {
-            items.push(me.Math.random(1, 1000) * (me.Math.random(1,4) == 1 ? -1 : 1));
+            items.push(me.Math.random(1, 1000) * (me.Math.random(1,4) == 1 ? 1 : -1));
         }
         return items;
     }

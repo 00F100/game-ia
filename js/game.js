@@ -9,7 +9,7 @@ var game = {
 
     ia: {
         alive: false,
-        // humans: []
+        weightSeq: []
     },
 
     enemies: [],
