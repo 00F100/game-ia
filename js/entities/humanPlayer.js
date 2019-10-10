@@ -1,5 +1,5 @@
 var HumanPlayer = me.Entity.extend({
-    init : function (x = 30, y = 300, callbackColision, callbackUpdate, matrix) {
+    init : function (x, y, callbackColision, callbackUpdate, matrix) {
 
         this.distance = 0;
 

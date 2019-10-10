@@ -1,15 +1,13 @@
 module.exports = function(grunt) {
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
-
     concat: {
       dist: {
         src: [
           'lib/melonjs.js',
-          'lib/plugins/**/*.js',
           'js/game.js',
-          // 'build/js/resources.js',
           'js/**/*.js',
+          'node_modules/@00f100/neuralnetworkjs/src/neural-network.js'
         ],
         dest: 'build/js/app.js'
       }
@@ -21,9 +19,6 @@ module.exports = function(grunt) {
           src: 'index.css',
           dest: 'build/index.css'
         },{
-          src: 'main.js',
-          dest: 'build/main.js'
-        },{
           src: 'manifest.json',
           dest: 'build/manifest.json'
         },{
@@ -33,18 +28,14 @@ module.exports = function(grunt) {
           src: 'data/**/*',
           dest: 'build/',
           expand: true
-        },{
-          src: 'icons/*',
-          dest: 'build/',
-          expand: true
         }]
       }
     },
 
-    // clean: {
-    //   app: ['build/js/app.js'],
-    //   dist: ['build/','bin/'],
-    // },
+    clean: {
+      app: ['build/js/app.js'],
+      dist: ['build/','bin/'],
+    },
 
     processhtml: {
       dist: {
@@ -130,20 +121,8 @@ module.exports = function(grunt) {
           varname: 'game.resources',
         },
         files: [{
-          src: ['data/bgm/**/*', 'data/sfx/**/*'],
-          type: 'audio'
-        },{
           src: ['data/img/**/*.png'],
           type: 'image'
-        },{
-          src: ['data/img/**/*.json'],
-          type: 'json'
-        },{
-          src: ['data/map/**/*.tmx', 'data/map/**/*.json'],
-          type: 'tmx'
-        },{
-          src: ['data/map/**/*.tsx'],
-          type: 'tsx'
         }]
       }
     },
@@ -161,9 +140,9 @@ module.exports = function(grunt) {
   });
 
   grunt.loadNpmTasks('grunt-contrib-concat');
-  // grunt.loadNpmTasks('grunt-contrib-uglify');
+  grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-contrib-copy');
-  // grunt.loadNpmTasks('grunt-contrib-clean');
+  grunt.loadNpmTasks('grunt-contrib-clean');
   grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-processhtml');
   grunt.loadNpmTasks("grunt-replace");
@@ -178,10 +157,10 @@ module.exports = function(grunt) {
     'resources',
     'concat',
     'replace',
-    // 'uglify',
+    'uglify',
     'copy',
     'processhtml',
-    // 'clean:app',
+    'clean:app',
   ]);
   grunt.registerTask('dist', ['default', 'download-electron', 'asar']);
   grunt.registerTask('serve', ['resources', 'connect', 'watch']);

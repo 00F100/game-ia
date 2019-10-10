@@ -25,12 +25,6 @@ var WelcomeScreen = me.Stage.extend( {
     },
     
     onDestroyEvent: function() {
-        // me.game.world.removeChild(this.color);
-        // me.game.world.removeChild(this.sidewalk);
-        // me.game.world.removeChild(this.cacti);
-        // me.game.world.removeChild(this.plant);
-        // me.game.world.removeChild(this.cloud);
-        // me.game.world.removeChild(this.fade);
-        // me.game.world.removeChild(this.start);
+        me.game.world.removeChild(this.color);
     }
 });

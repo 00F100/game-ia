@@ -20,8 +20,6 @@ var EnemyCacti = me.Entity.extend({
         
         this.body.setVelocity(4 * game.vel.x,0);
 
-        // this.alwaysUpdate = true;
-
         this.renderable = new me.Sprite(0, 0, {
             image: me.loader.getImage('enemyCacti'),
             framewidth: 30,

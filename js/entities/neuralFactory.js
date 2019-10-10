@@ -1,16 +1,15 @@
 var NeuralFactory = me.Container.extend({
 
-    init: function(limit, minChange, maxChange, propChanges, neuralColumns, neuralRows, neuralOutputs, send = true) {
+    init: function(limit, minChange, maxChange, propChanges, neuralColumns, neuralRows, neuralOutputs, send) {
         var self = this;
-        this.firstFix = true;
-        this.send = send;
-        this.limit = limit;
         game.alive = false;
         game.ia.alive = true;
+        game.ia.alive = true;
         this._super(me.Container, 'init');
+        this.firstFix = true;
+        this.limit = limit;
         this.humans = [];
         this.down = [];
-        game.ia.alive = true;
         this.minChange = minChange;
         this.maxChange = maxChange;
         this.totalWeight = this.getPosbKeys(6, neuralColumns, neuralRows, neuralOutputs);
@@ -19,13 +18,18 @@ var NeuralFactory = me.Container.extend({
         this.neuralRows = neuralRows;
         this.neuralOutputs = neuralOutputs;
         var localMatrix = [];
+        if(send == null) {
+            this.send = true;
+        } else {
+            this.send = send;
+        }
         for(var i = 0; i < this.limit; i++) {
             var matrix = this.fixMatrix();
             localMatrix.push(matrix);
         }
         for(var i = 0; i < this.limit; i++) {
             var lmatrix = localMatrix[i];
-            var human = new HumanPlayer(me.Math.random(5, 150), 300, function(context) {
+            var human = new HumanPlayer(this.rand(5, 150), 300, function(context) {
                 if(context.alive) {
                     context.alive = false;
                     context.body.vel.x = 0;
@@ -76,16 +80,17 @@ var NeuralFactory = me.Container.extend({
 
     fixMatrix: function() {
         if(game.ia.weightSeq != undefined) {
-            // console.log(typeof game.ia.weightSeq)
             var matrix = this.clone(game.ia.weightSeq);
-            // matrix = Object.values(matrix);
             if(this.firstFix) {
                 this.firstFix = false;
             } else {
                 var possibilities = this.getPossibilities([]);
                 if(possibilities.length > 0) {
                     for(var i in possibilities) {
-                        matrix[possibilities[i]] = (matrix[possibilities[i]] + me.Math.random(this.minChange, this.maxChange)) * (me.Math.random(0,3)%2 == 0 ? -1 : 1);
+                        matrix[possibilities[i]] = (matrix[possibilities[i]] + this.rand(this.minChange, this.maxChange)) * (this.rand(0,3)%2 == 0 ? -1 : 1);
+                        if(matrix[possibilities[i]] > 1000 || matrix[possibilities[i]] < -1000) {
+                            matrix[possibilities[i]] = 0;
+                        }
                     }
                 }
             }
@@ -108,7 +113,7 @@ var NeuralFactory = me.Container.extend({
         if(this.limitChanges > 0) {
             var doContinue = true;
             do {
-                var weight = me.Math.random(0, this.totalWeight);
+                var weight = this.rand(0, this.totalWeight);
                 if(!this.inArray(weight, list) && list.length < this.limitChanges) {
                     list.push(weight);
                 }
@@ -163,4 +168,8 @@ var NeuralFactory = me.Container.extend({
         }
         return (inputs * rows) + value + (rows * outputs);
     },
+
+    rand: function(min, max) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
 });

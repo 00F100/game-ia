@@ -26,8 +26,6 @@ var Plant = me.Entity.extend({
         
         this.body.setVelocity(3 * game.vel.x,0);
 
-        // this.alwaysUpdate = true;
-
         this.renderable = new me.Sprite(0, 0, {
             image: me.loader.getImage('plant1'),
             framewidth: 70,
