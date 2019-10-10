@@ -1,0 +1,12 @@
+{
+  "short_name": "ET Bilu",
+  "name": "ET Bilu Game",
+  "orientation": "landscape",
+  "developer": {
+    "name": "Joao Moraes",
+    "url": "https://00f100.github.io/game-ia/"
+  },
+  "start_url": "./index.html",
+  "display": "fullscreen",
+  "icons": []
+}
