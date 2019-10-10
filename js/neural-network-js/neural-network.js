@@ -4,9 +4,8 @@ var NeuralNetwork = {
         if(matrix == null) {
             matrix = [];
         }
-        // console.log(matrix);
         var value = 0;
-        for(var i = 0; i < (hiddenColumn-2); i++) {
+        for(var i = 0; i < (hiddenColumn-1); i++) {
             value = value + (hiddenRow * hiddenRow);
         }
         var totalWeight = (input.length * hiddenRow) + value + (hiddenRow * outputColumns);
@@ -40,7 +39,8 @@ var NeuralNetwork = {
                     }
                     neuroCount++;
                 }
-            } else if (column == (hiddenColumn-1)) {
+            }
+            if (column == (hiddenColumn-1)) {
                 var columnCalc = (column - 1);
                 var neuroCountBefore = neurons.length;
                 for(var c = 0; c < hiddenRow; c++) {

@@ -1,9 +1,11 @@
 var HumanPlayer = me.Entity.extend({
-    init : function (x = 30, y = 300, callbackColision, callbackUpdate) {
+    init : function (x = 30, y = 300, callbackColision, callbackUpdate, matrix) {
 
         this.distance = 0;
 
         this.weightSeq = null;
+
+        this.matrix = matrix;
 
         this.callback = [];
         this.callback['colision'] = callbackColision;
@@ -84,7 +86,7 @@ var HumanPlayer = me.Entity.extend({
                 }
             }
             if(typeof this.callback['update'] == 'function') {
-                this.callback['update'](this);
+                this.callback['update'](this, this.matrix);
             }
         }
 
