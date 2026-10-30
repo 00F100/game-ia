@@ -1,0 +1,8 @@
+services:
+  game:
+    build:
+      context: .
+      additional_contexts:
+        nn: ../NeuralNetworkJS
+    ports:
+      - "8080:80"

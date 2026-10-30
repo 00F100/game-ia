@@ -1,11 +1,10 @@
 var HumanPlayer = me.Entity.extend({
-    init : function (x, y, callbackColision, callbackUpdate, matrix) {
+    init : function (x, y, callbackColision, callbackUpdate, net, bindKeys) {
 
-        this.distance = 0;
-
-        this.weightSeq = null;
-
-        this.matrix = matrix;
+        this.fitness = 0;
+        this.ducking = false;
+        this.net = net || null;
+        this.bindKeys = bindKeys !== false;
 
         this.callback = [];
         this.callback['colision'] = callbackColision;
@@ -18,6 +17,11 @@ var HumanPlayer = me.Entity.extend({
 
         this.entityWidth = 74;
         this.entityHeight = 89;
+        this.hitWidth = this.entityWidth - 20;
+        // Duck frame feet are at y=71; walk feet at y=88. Shift the sprite
+        // down by that gap so the pose sits on the sidewalk. melonJS SAT
+        // ignores body.pos, so this does not push the entity into the ground.
+        this.duckOffset = 17;
 
         this._super(
             me.Entity,
@@ -27,7 +31,7 @@ var HumanPlayer = me.Entity.extend({
                 {
                     width : this.entityWidth,
                     height : this.entityHeight,
-                    shapes : [ new me.Rect(0, 0, this.entityWidth-20, this.entityHeight) ],
+                    shapes : [ new me.Rect(0, 0, this.hitWidth, this.entityHeight) ],
                     framewidth: this.entityWidth,
                     frameheight: this.entityHeight
                 }
@@ -53,9 +57,11 @@ var HumanPlayer = me.Entity.extend({
 
         this.isKinematic = false;
 
-        me.input.bindKey(me.input.KEY.DOWN, "duck");
-        me.input.bindKey(me.input.KEY.UP, "jump");
-        me.input.bindKey(me.input.KEY.SPACE, "jump");
+        if (this.bindKeys) {
+            me.input.bindKey(me.input.KEY.DOWN, "duck");
+            me.input.bindKey(me.input.KEY.UP, "jump");
+            me.input.bindKey(me.input.KEY.SPACE, "jump");
+        }
     },
 
     update : function (dt) {
@@ -64,29 +70,25 @@ var HumanPlayer = me.Entity.extend({
             me.game.world.removeChild(this);
         }
         if(this.alive) {
-            var self = this;
+            this.fitness++;
 
-            if (game.vel.x < 2) {
-                this.body.gravity.y = 0.17;
-            } else if(game.vel.x < 3) {
-                this.body.gravity.y = 0.22;
-            } else if (game.vel.x < 4) {
-                this.body.gravity.y = 0.28;
-            }
+            this.body.gravity.y = game.gravityY();
 
-            if (me.input.isKeyPressed('jump')) {
-                if (!this.body.jumping && !this.body.falling) {
-                    this.runJump();
-                }
-            } else if (me.input.isKeyPressed('duck')) {
-                this.runDuck();
-            } else {
-                if(!this.renderable.isCurrentAnimation('walk') && !this.body.jumping && !this.body.falling) {
+            if (this.bindKeys) {
+                if (me.input.isKeyPressed('jump')) {
+                    if (!this.body.jumping && !this.body.falling) {
+                        this.runJump();
+                    }
+                } else if (me.input.isKeyPressed('duck')) {
+                    this.runDuck();
+                } else if (!this.body.jumping && !this.body.falling && this.ducking) {
+                    this.runWalk();
+                } else if (!this.renderable.isCurrentAnimation('walk') && !this.body.jumping && !this.body.falling) {
                     this.runWalk();
                 }
             }
             if(typeof this.callback['update'] == 'function') {
-                this.callback['update'](this, this.matrix);
+                this.callback['update'](this);
             }
         }
 
@@ -99,35 +101,55 @@ var HumanPlayer = me.Entity.extend({
         switch (response.b.body.collisionType) {
             case me.collision.types.WORLD_SHAPE:
                 return true;
-                break;
             case me.collision.types.PLAYER_OBJECT:
                 return false;
-                break;
             case me.collision.types.ENEMY_OBJECT:
-                this.callback['colision'](this);
+                if (this.alive && typeof this.callback['colision'] == 'function') {
+                    this.callback['colision'](this);
+                }
                 break;
         }
         return true;
     },
 
+    _setDuckHitbox: function(ducking) {
+        var shape = this.body.shapes[0];
+        if (!shape || !shape.points || shape.points.length < 4) {
+            return;
+        }
+        var top = ducking ? this.duckOffset : 0;
+        shape.points[0].y = top;
+        shape.points[1].y = top;
+        if (typeof shape.recalc === 'function') {
+            shape.recalc();
+        }
+        this.body.pos.x = 0;
+        this.body.pos.y = ducking ? this.duckOffset : 0;
+    },
 
     runJump: function() {
+        if (this.ducking) {
+            this._setDuckHitbox(false);
+            this.ducking = false;
+        }
         this.renderable.setCurrentAnimation("jump");
         this.body.vel.y = -this.body.maxVel.y * me.timer.tick;
         this.body.jumping = true;
     },
 
     runDuck: function() {
-        this.body.shapes[0].points[0].y = 20;
-        this.body.shapes[0].points[1].y = 20;
-        this.body.pos.y = 20;
+        if (!this.ducking) {
+            this._setDuckHitbox(true);
+            this.ducking = true;
+        }
         this.renderable.setCurrentAnimation("duck");
     },
 
     runWalk: function() {
-        this.body.pos.y = 0;
-        this.body.shapes[0].points[0].y = 0;
-        this.body.shapes[0].points[1].y = 0;
+        if (this.ducking) {
+            this._setDuckHitbox(false);
+        }
+        this.ducking = false;
         this.renderable.setCurrentAnimation("walk");
     }
 });

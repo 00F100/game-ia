@@ -1,13 +1,24 @@
-# Game AI
+# ET Bilu
 
-Play: [00f100.github.io/game-ia](https://00f100.github.io/game-ia/)
+Endless runner with a neural-network agent. The network lives in a separate library ([NeuralNetworkJS](../NeuralNetworkJS)); this game only consumes `predict` / `clone` / `mutate`.
 
-Controls:
+## Run with Docker
 
-Keyboard ENTER, UP and DOWN
+No local npm. The image copies `NeuralNetworkJS/src/neural-network.js` into `vendor/` at build time.
 
-Example of game using AI
+```bash
+docker compose up --build
+```
 
-![Screen 1](screen1.png)
-![Screen 2](screen2.png)
+Open [http://localhost:8080](http://localhost:8080).
 
+## Controls
+
+- ENTER — start
+- UP / SPACE — jump (play alone)
+- DOWN — duck (play alone)
+- Menu: play alone, see AI (50 agents, one generation after another)
+
+## AI mode
+
+Each generation keeps the two fittest genomes intact and mutates the rest. The agent sees the nearest obstacle ahead (distance, size, altitude, speed, airborne) and chooses idle, jump, or duck.

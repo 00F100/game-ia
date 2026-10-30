@@ -1,13 +1,12 @@
 var EnemyFly = me.Entity.extend({
 
     init: function() {
-        var self = this;
         this._super(
             me.Entity,
             "init",
             [
-                630, 
-                me.Math.random(1,4)%2 == 0 ? 340 : 410,
+                630,
+                me.Math.random(0, 2) === 0 ? 340 : 410,
                 {
                     width : 75,
                     height : 33.5,
@@ -22,7 +21,7 @@ var EnemyFly = me.Entity.extend({
             ]
         );
         
-        this.body.setVelocity(4 * game.vel.x,0);
+        this.body.setVelocity(4 * game.vel.x, 0);
 
         this.alwaysUpdate = true;
 
@@ -32,21 +31,23 @@ var EnemyFly = me.Entity.extend({
             frameheight: 33.5
         });
 
-        this.body.collisionType = me.collision.types.ENEMY_OBJECT
+        this.body.collisionType = me.collision.types.ENEMY_OBJECT;
 
         this.isKinematic = false;
 
-        game.enemies.push(this.body);
-        this.enemyId = game.enemies.lenght-1;
+        game.enemies.push(this);
     },
 
     update: function(dt) {
         if(game.alive || game.ia.alive) {
-            this.body.vel.x += -this.body.accel.x * me.timer.tick;    
+            this.body.vel.x += -this.body.accel.x * me.timer.tick;
             var limit = this.body.ancestor.pos._x + this.body.width;
             if(limit <= 15) {
                 me.game.world.removeChild(this);
-                game.enemies.splice(this.enemyId, 1);
+                var idx = game.enemies.indexOf(this);
+                if (idx !== -1) {
+                    game.enemies.splice(idx, 1);
+                }
             }
         } else {
             this.body.setVelocity(0, 0);

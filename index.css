@@ -1,6 +1,13 @@
+html, body {
+    height: 100%;
+}
+
 body {
     background-color: #000;
     color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 
     /* Allow mouse dragging. */
     -moz-user-select: none;
@@ -17,8 +24,15 @@ body {
     margin: 0;
 }
 
+#layout {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 18px;
+}
+
 #screen canvas {
-    margin: auto;
+    margin: 0;
 
     /* Hide the gap for font descenders. */
     display: block;
@@ -31,4 +45,18 @@ body {
     image-rendering: optimize-contrast;
     image-rendering: pixelated;
     -ms-interpolation-mode: nearest-neighbor;
+}
+
+#brain {
+    display: none;
+    width: 400px;
+    height: 480px;
+    background: #16110d;
+    border: 1px solid #3a3128;
+    box-sizing: content-box;
+}
+
+#brain.is-on,
+body.ai-view #brain {
+    display: block;
 }

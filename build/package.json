@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "dependencies": {
     "@00f100/neuralnetworkjs": "^1.0.0",
+    "coffeescript": "^2.6.1",
     "i18n-js": "^3.3.0"
   },
   "devDependencies": {

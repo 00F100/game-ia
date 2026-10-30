@@ -1,0 +1,10 @@
+.git
+node_modules
+build
+bin
+*.md
+docker-compose.yml
+Dockerfile
+Gruntfile.js
+package.json
+tasks

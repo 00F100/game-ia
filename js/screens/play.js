@@ -5,7 +5,15 @@ var PlayScreen = me.Stage.extend( {
     },
 
     onResetEvent: function() {
-        
+        game.alive = true;
+        game.ia.alive = false;
+        game.vel.x = 1;
+        game.enemies = [];
+        game.human.distance = 0;
+        if (typeof NeuralViz !== 'undefined') {
+            NeuralViz.hide();
+        }
+
         this.color = new me.ColorLayer("background", "#ffe2b7", 0);
         this.scoreBoard = new ScoreBoard();
         this.sidewalk = new Sidewalk(0, 10);
@@ -20,7 +28,7 @@ var PlayScreen = me.Stage.extend( {
             game.vel.x = 1;
             me.state.change(me.state.GAMEOVER);
         });
-        this.enemyFactory = new EnemyFactory(75, 60);
+        this.enemyFactory = new EnemyFactory(75, 85, 60);
 
         me.game.world.addChild(this.color, 0);
         me.game.world.addChild(this.scoreBoard, 100);

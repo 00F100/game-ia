@@ -16,6 +16,9 @@ var Gameover = me.Stage.extend( {
         
         game.alive = true;
         game.vel.x = 1;
+        if (typeof NeuralViz !== 'undefined') {
+            NeuralViz.hide();
+        }
 
         me.game.world.addChild(this.color, 0);
         me.game.world.addChild(this.sidewalk, 10);

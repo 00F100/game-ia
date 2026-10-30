@@ -9,7 +9,11 @@ var game = {
 
     ia: {
         alive: false,
-        weightSeq: []
+        reset: false,
+        generation: 1,
+        bestDistance: 0,
+        bestWeights: null,
+        hall: []
     },
 
     enemies: [],
@@ -19,13 +23,21 @@ var game = {
         velocity: 0
     },
 
-    ia: {
-        generation: 1
-    },
-
     vel: {
         x: 1,
         y: 0
+    },
+
+    groundY: 450,
+
+    gravityY: function() {
+        if (this.vel.x < 2) {
+            return 0.17;
+        }
+        if (this.vel.x < 3) {
+            return 0.22;
+        }
+        return 0.28;
     },
 
     // game assets
@@ -45,7 +57,6 @@ var game = {
 
     onload: function()
     {
-        // if (!me.video.init(game.res.width, game.res.height, {wrapper : "screen", scale : "auto"})) {
         if (!me.video.init(game.res.width, game.res.height, {wrapper : "screen"})) {
             alert("Your browser does not support HTML5 canvas.");
             return;
@@ -53,11 +64,15 @@ var game = {
         me.audio.init("mp3,ogg");
         me.loader.onload = this.loaded.bind(this);
         me.loader.preload(game.assets);
+        if (typeof NeuralViz !== 'undefined') {
+            NeuralViz.mount();
+        }
     },
 
     loaded: function () {
 
         me.state.NEURALNETWORK = me.state.USER + 1;
+        me.state.NEURALNETWORK2 = me.state.USER + 2;
 
         me.state.set(me.state.READY, new WelcomeScreen());
         me.state.set(me.state.PLAY, new PlayScreen());

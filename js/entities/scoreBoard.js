@@ -29,12 +29,14 @@ var ScoreItem = me.Renderable.extend({
             }
             this.interval = 0;
             this.distance = 0;
+            game.human.distance = 0;
         }
     },
     draw: function(renderer) {
         this.font.draw(renderer, 'Distance: ' + parseInt(this.distance), 600, 100);
-        if(game.ia.generation > 0) {
+        if(game.ia.alive || game.ia.generation > 1) {
             this.font.draw(renderer, 'Generation: ' + parseInt(game.ia.generation), 600, 200);
+            this.font.draw(renderer, 'Best: ' + parseInt(game.ia.bestDistance), 600, 250);
         }
     }
 });

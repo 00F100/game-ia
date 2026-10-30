@@ -9,7 +9,7 @@ var Sidewalk = me.Entity.extend({
             "init",
             [
                 x, 
-                450,
+                game.groundY,
                 {
                     width : 72,
                     height : 92,

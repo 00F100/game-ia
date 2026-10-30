@@ -5,6 +5,9 @@ var WelcomeScreen = me.Stage.extend( {
     },
 
     onResetEvent: function() {
+        game.alive = true;
+        game.ia.alive = false;
+
         this.color = new me.ColorLayer("background", "#ffe2b7", 0);
         this.fade = new me.ColorLayer("background", "#000000", 0);
         this.fade.setOpacity(0.4);
@@ -21,7 +24,9 @@ var WelcomeScreen = me.Stage.extend( {
         me.game.world.addChild(this.cloud, 10);
         me.game.world.addChild(this.fade, 20);
         me.game.world.addChild(this.start, 30);
-        
+        if (typeof NeuralViz !== 'undefined') {
+            NeuralViz.hide();
+        }
     },
     
     onDestroyEvent: function() {

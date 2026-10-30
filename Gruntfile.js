@@ -7,7 +7,7 @@ module.exports = function(grunt) {
           'lib/melonjs.js',
           'js/game.js',
           'js/**/*.js',
-          'node_modules/@00f100/neuralnetworkjs/src/neural-network.js'
+          'vendor/neural-network.js'
         ],
         dest: 'build/js/app.js'
       }
