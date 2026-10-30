@@ -2,6 +2,10 @@
 
 Endless runner with a neural-network agent. The network lives in a separate library ([NeuralNetworkJS](../NeuralNetworkJS)); this game only consumes `predict` / `clone` / `mutate`.
 
+**Live demo:** [https://00f100.github.io/game-ia/](https://00f100.github.io/game-ia/)
+
+![ET Bilu with the best agent's neural network](screenshot.png)
+
 ## Run with Docker
 
 No local npm. The image copies `NeuralNetworkJS/src/neural-network.js` into `vendor/` at build time.
